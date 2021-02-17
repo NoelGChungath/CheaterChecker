@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import "./ui.css";
-import { app } from "../utils/base.js";
-import firebase from "firebase";
 import { AuthContext } from "../utils/Auth.js";
-import { addInfo, checkUserExist } from "../utils/Firestore";
+import { addInfo } from "../utils/Firestore";
 import Navbar from "./Navbar";
-import { Layout, Steps, Button, Form, Input, Radio } from "antd";
+import { Layout, Steps, Button, Form, Input } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import FooterPage from "./footer";
+import FooterSection from "./FooterSection";
 const { Content } = Layout;
 const { Step } = Steps;
 
@@ -67,7 +65,7 @@ class ExtraInfo extends Component {
             </Form>
           </div>
         </Content>
-        <FooterPage />
+        <FooterSection />
       </Layout>
     );
   }

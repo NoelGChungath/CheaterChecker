@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import "./ui.css";
-import { Layout, Menu, Input } from "antd";
+import { Layout, Menu } from "antd";
 import {
   DesktopOutlined,
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-
+import { Link } from "react-router-dom";
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -32,10 +32,10 @@ class SiderBar extends Component {
         )}
         <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
           <Menu.Item key="1" icon={<PieChartOutlined />}>
-            Home
+            <Link to="/">Home</Link>
           </Menu.Item>
           <Menu.Item key="2" icon={<DesktopOutlined />}>
-            Classes
+            <Link to="/classes">Classes</Link>
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="User">
             <Menu.Item key="3">Tom</Menu.Item>

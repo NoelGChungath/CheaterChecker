@@ -1,23 +1,16 @@
 import React, { Component } from "react";
 import { AuthContext } from "../utils/Auth";
-import { app } from "../utils/base";
-import { getUserRole, addClass, joinClass } from "../utils/Firestore";
+import { addClass, joinClass } from "../utils/Firestore";
 import "./ui.css";
-import { Layout, Breadcrumb, Input, Button, Form } from "antd";
-import SiderBar from "./sideBar";
-import FooterPage from "./footer";
+import { Layout, Breadcrumb, Button, Form, Input } from "antd";
+import SiderBar from "./SideBar";
+import FooterSection from "./FooterSection";
+import HeaderSection from "./HeaderSection";
 
-const { Search } = Input;
-
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 class Home extends Component {
   static contextType = AuthContext;
-  state = {
-    status: null,
-    value: null,
-  };
-
   generateCode = () => {
     const str =
       "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
@@ -26,7 +19,13 @@ class Home extends Component {
       const randomIndex = Math.floor(Math.random() * str.length);
       genStr += str[randomIndex];
     }
-    addClass(genStr);
+    return genStr;
+  };
+
+  createClass = () => {
+    const { currentUser } = this.context;
+    const str = this.generateCode();
+    addClass(str, currentUser.uid);
   };
 
   addToClass = async (values) => {
@@ -39,44 +38,17 @@ class Home extends Component {
     }
   };
 
-  getRole = async () => {
-    const { currentUser } = this.context;
-    const data = await getUserRole(currentUser.uid);
-    this.setState({ status: data });
-  };
-
-  componentDidMount() {
-    this.getRole();
-  }
-
   onChange = (e) => {
     this.setState({ value: e.target.value });
   };
 
   render() {
-    const { status } = this.state;
-
+    const { status } = this.context;
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <SiderBar />
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }}>
-            {" "}
-            <Search
-              className="search"
-              placeholder="input search text"
-              enterButton="Search"
-              size="large"
-            />
-            <Button
-              size="large"
-              style={{ float: "right", margin: "10px" }}
-              onClick={() => app.auth().signOut()}
-              type="primary"
-            >
-              Sign out
-            </Button>
-          </Header>
+          <HeaderSection />
           <Content style={{ margin: "0 16px" }}>
             <Breadcrumb style={{ margin: "16px 0" }}>
               <Breadcrumb.Item>User</Breadcrumb.Item>
@@ -90,7 +62,7 @@ class Home extends Component {
                 status.role == true ? (
                   <div>
                     <h3>Teacher</h3>
-                    <button onClick={this.generateCode}>Generate code</button>
+                    <button onClick={this.createClass}>create Class</button>
                   </div>
                 ) : (
                   <div>
@@ -109,17 +81,12 @@ class Home extends Component {
                         <Input
                           className="infoInput"
                           placeholder="Please input code"
-                          value={this.state.someVal || ""}
                           onChange={this.onChange}
                         />
                       </Form.Item>
 
                       <Form.Item>
-                        <Button
-                          onClick={() => this.addToClass()}
-                          type="primary"
-                          htmlType="submit"
-                        >
+                        <Button type="primary" htmlType="submit">
                           Join Class
                         </Button>
                       </Form.Item>
@@ -131,7 +98,7 @@ class Home extends Component {
               )}
             </div>
           </Content>
-          <FooterPage />
+          <FooterSection />
         </Layout>
       </Layout>
     );

@@ -2,10 +2,18 @@ import React, { Component } from "react";
 import { app } from "./base";
 import "antd/dist/antd.css";
 import { Spin } from "antd";
-const AuthContext = React.createContext();
+import { checkUserExist, getUserRole } from "./Firestore";
+import { Redirect, withRouter } from "react-router-dom";
+
+export const AuthContext = React.createContext();
 
 class AuthProvider extends Component {
-  state = { currentUser: null, loader: true };
+  state = {
+    currentUser: null,
+    loader: true,
+    status: null,
+    sendUser: false,
+  };
   style = {
     display: "flex",
     justifyContent: "center",
@@ -16,10 +24,42 @@ class AuthProvider extends Component {
   componentDidMount() {
     app.auth().onAuthStateChanged((user) => {
       this.setState({ currentUser: user, loader: false });
+      if (user != null) {
+        this.checkUser();
+      }
     });
   }
+  checkUser = async () => {
+    let { currentUser, sendUser } = this.state;
+    const { history } = this.props;
+    if (currentUser != null && sendUser == false) {
+      let res = await checkUserExist(currentUser.uid);
+      let temp = "";
+      if (res) {
+        temp = "/selectrole";
+      } else {
+        temp = "/";
+      }
+      sendUser = true;
+      history.push(temp);
+      this.setState({ currentUser, sendUser });
+    }
+  };
+
+  getRole = async () => {
+    const { currentUser, status } = this.state;
+    if (currentUser != null && status == null) {
+      const data = await getUserRole(currentUser.uid);
+      this.setState({ status: data });
+    }
+  };
+  componentDidUpdate() {
+    this.checkUser();
+    this.getRole();
+  }
+
   render() {
-    const { currentUser, loader } = this.state;
+    const { currentUser, loader, status } = this.state;
     if (loader) {
       return (
         <div style={this.style}>
@@ -28,7 +68,7 @@ class AuthProvider extends Component {
       );
     } else {
       return (
-        <AuthContext.Provider value={{ currentUser }}>
+        <AuthContext.Provider value={{ currentUser, status }}>
           {this.props.children}
         </AuthContext.Provider>
       );
@@ -36,7 +76,7 @@ class AuthProvider extends Component {
   }
 }
 
-export { AuthProvider, AuthContext };
+export default withRouter(AuthProvider);
 // export const AuthProvider = ({ children }) => {
 //   const [currentUser, setCurrentUser] = useState(null);
 //   const [pending, setPending] = useState(true);

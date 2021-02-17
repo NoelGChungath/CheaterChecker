@@ -1,9 +1,8 @@
-import { db, app } from "./base";
+import { db } from "./base";
 import firebase from "firebase/app";
 const checkUserExist = async (uid) => {
   const docRef = db.collection("users").doc(uid);
   const doc = await docRef.get();
-  console.log(doc.exists);
 
   if (!doc.exists) {
     return true;
@@ -30,27 +29,46 @@ const addInfo = async (values, uid) => {
 
   await docRef.update(values);
 };
-const addClass = (code) => {
+const addClass = (code, uid) => {
   const docRef = db.collection("classes").doc(code);
   let data = {
     classCode: code,
     className: "Class" + code,
+    owner: uid,
     students: null,
   };
-
   docRef.set(data);
+  addClassToUser(code, uid);
 };
 const joinClass = async (code, uid) => {
   try {
     const classesRef = db.collection("classes").doc(code);
-    const docRef = db.collection("users").doc(uid);
-    await docRef.update(code);
     await classesRef.update({
       students: firebase.firestore.FieldValue.arrayUnion(uid),
     });
+    addClassToUser(code, uid);
   } catch (err) {
     return err;
   }
+};
+const getAllClasses = async (uid) => {
+  const docRef = db.collection("users").doc(uid);
+  const doc = await docRef.get();
+  const { Classes } = doc.data();
+  const classAr = [];
+  for (const code of Classes) {
+    const classRef = db.collection("classes").doc(code);
+    const docData = await classRef.get();
+    const classData = docData.data();
+    classAr.push(classData);
+  }
+  return classAr;
+};
+const addClassToUser = async (code, uid) => {
+  const docRef = db.collection("users").doc(uid);
+  await docRef.update({
+    Classes: firebase.firestore.FieldValue.arrayUnion(code),
+  });
 };
 const getUserRole = async (uid) => {
   const docRef = db.collection("users").doc(uid);
@@ -59,4 +77,12 @@ const getUserRole = async (uid) => {
   return data;
 };
 
-export { checkUserExist, addUser, getUserRole, addClass, joinClass, addInfo };
+export {
+  checkUserExist,
+  addUser,
+  getUserRole,
+  addClass,
+  joinClass,
+  addInfo,
+  getAllClasses,
+};

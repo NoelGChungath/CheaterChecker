@@ -3,10 +3,9 @@ import "./ui.css";
 import { app } from "../utils/base.js";
 import firebase from "firebase";
 import { AuthContext } from "../utils/Auth.js";
-import { checkUserExist } from "../utils/Firestore";
 import Navbar from "./Navbar";
 import { Layout, Steps } from "antd";
-import FooterPage from "./footer";
+import FooterSection from "./FooterSection";
 const { Content } = Layout;
 const { Step } = Steps;
 
@@ -18,28 +17,6 @@ class Login extends Component {
     const raw = app.auth().signInWithRedirect(provider);
     console.log(raw);
   };
-
-  checkUser = async () => {
-    const { currentUser } = this.context;
-    if (currentUser != null) {
-      let res = await checkUserExist(currentUser.uid);
-      if (res) {
-        this.props.history.push({
-          pathname: "/selectrole",
-          state: { uid: currentUser.uid },
-        });
-      } else {
-        this.props.history.push("/");
-      }
-    }
-  };
-
-  componentDidUpdate() {
-    this.checkUser();
-  }
-  componentDidMount() {
-    this.checkUser();
-  }
 
   render() {
     return (
@@ -85,7 +62,7 @@ class Login extends Component {
             </button>
           </div>
         </Content>
-        <FooterPage />
+        <FooterSection />
       </Layout>
     );
   }

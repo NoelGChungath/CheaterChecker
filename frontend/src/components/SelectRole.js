@@ -2,17 +2,18 @@ import React, { Component } from "react";
 import { addUser } from "../utils/Firestore";
 import Navbar from "./Navbar";
 import { Layout, Steps, Button } from "antd";
-import FooterPage from "./footer";
+import FooterSection from "./FooterSection";
+import { AuthContext } from "../utils/Auth";
 const { Content } = Layout;
 const { Step } = Steps;
 class SelectRole extends Component {
-  state = {};
+  static contextType = AuthContext;
   selectRole = async (val) => {
-    const userUid = this.props.location.state.uid;
+    const { currentUser } = this.context;
     if (val == "teacher") {
-      await addUser(userUid, true);
+      await addUser(currentUser.uid, true);
     } else {
-      await addUser(userUid, false);
+      await addUser(currentUser.uid, false);
     }
     this.props.history.push("/extrainfo");
   };
@@ -45,7 +46,7 @@ class SelectRole extends Component {
             </Button>
           </div>
         </Content>
-        <FooterPage />
+        <FooterSection />
       </Layout>
     );
   }
