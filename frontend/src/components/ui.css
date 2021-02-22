@@ -104,3 +104,10 @@ button ~ button {
 .info {
   margin: 2vh;
 }
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 7vh;
+}

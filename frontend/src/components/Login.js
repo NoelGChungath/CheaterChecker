@@ -15,7 +15,6 @@ class Login extends Component {
   googleLogin = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     const raw = app.auth().signInWithRedirect(provider);
-    console.log(raw);
   };
 
   render() {
@@ -24,11 +23,6 @@ class Login extends Component {
         <Navbar />
         <Content style={{ padding: "5vh" }}>
           <div className="site-layout-content">
-            <Steps size="small" current={0}>
-              <Step title="Login" />
-              <Step title="Select Role" />
-              <Step title="Extra Info" />
-            </Steps>
             <h1>Log in</h1>
             <button
               type="button"

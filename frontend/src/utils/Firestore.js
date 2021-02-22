@@ -26,7 +26,6 @@ const addUser = async (uid, val) => {
 
 const addInfo = async (values, uid) => {
   const docRef = db.collection("users").doc(uid);
-
   await docRef.update(values);
 };
 const addClass = (code, uid) => {
@@ -55,11 +54,15 @@ const getAllClasses = async (uid) => {
   const docRef = db.collection("users").doc(uid);
   const doc = await docRef.get();
   const { Classes } = doc.data();
+  if (Classes == undefined) return null;
   const classAr = [];
   for (const code of Classes) {
     const classRef = db.collection("classes").doc(code);
     const docData = await classRef.get();
     const classData = docData.data();
+    const ownerData = await getUserRole(classData.owner);
+    classData["ownerName"] =
+      ownerData["nickname"] != undefined ? ownerData.nickname : "Not Available";
     classAr.push(classData);
   }
   return classAr;
@@ -76,8 +79,15 @@ const getUserRole = async (uid) => {
   const data = doc.data();
   return data;
 };
-
+const getAssigments = async (classCode) => {
+  const docRef = db.collection("assigments").doc(classCode);
+  const doc = await docRef.get();
+  let classAr = [];
+  classAr.push(doc.data());
+  return classAr;
+};
 export {
+  getAssigments,
   checkUserExist,
   addUser,
   getUserRole,

@@ -12,12 +12,20 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 class SiderBar extends Component {
-  state = {
-    collapsed: false,
-  };
+  constructor(props) {
+    super(props);
+    let temp = false;
+    console.log("dffd");
+    console.log(this.props);
+    if (this.props["state"] != undefined) {
+      temp = this.props.state;
+    }
+    this.state = {
+      collapsed: temp,
+    };
+  }
 
   onCollapse = (collapsed) => {
-    console.log(collapsed);
     this.setState({ collapsed });
   };
 
@@ -32,10 +40,24 @@ class SiderBar extends Component {
         )}
         <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
           <Menu.Item key="1" icon={<PieChartOutlined />}>
-            <Link to="/">Home</Link>
+            <Link
+              to={{
+                pathname: "/",
+                state: collapsed,
+              }}
+            >
+              Home
+            </Link>
           </Menu.Item>
           <Menu.Item key="2" icon={<DesktopOutlined />}>
-            <Link to="/classes">Classes</Link>
+            <Link
+              to={{
+                pathname: "/classes",
+                state: collapsed,
+              }}
+            >
+              Classes
+            </Link>
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="User">
             <Menu.Item key="3">Tom</Menu.Item>

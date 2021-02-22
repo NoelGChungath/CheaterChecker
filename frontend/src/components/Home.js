@@ -46,7 +46,7 @@ class Home extends Component {
     const { status } = this.context;
     return (
       <Layout style={{ minHeight: "100vh" }}>
-        <SiderBar />
+        <SiderBar state={this.props.location.state} />
         <Layout className="site-layout">
           <HeaderSection />
           <Content style={{ margin: "0 16px" }}>
