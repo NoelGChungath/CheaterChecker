@@ -3,7 +3,7 @@ import { app } from "./base";
 import "antd/dist/antd.css";
 import { Spin } from "antd";
 import { checkUserExist, getUserRole } from "./Firestore";
-import {  withRouter } from "react-router-dom";
+import { Redirect, withRouter } from "react-router-dom";
 
 export const AuthContext = React.createContext();
 
@@ -23,9 +23,10 @@ class AuthProvider extends Component {
 
   componentDidMount() {
     app.auth().onAuthStateChanged((user) => {
-      this.setState({ currentUser: user, loader: false });
       if (user != null) {
-        this.checkUser();
+        this.setState({ currentUser: user, loader: false, status: null });
+      } else {
+        this.setState({ currentUser: user, loader: false });
       }
     });
   }

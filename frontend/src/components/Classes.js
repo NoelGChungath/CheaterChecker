@@ -36,15 +36,16 @@ class Classes extends Component {
 
   getClass = async () => {
     const { currentUser } = this.context;
-    const data = await getAllClasses(currentUser.uid);
-    if (data == null) return null;
+    let data = await getAllClasses(currentUser.uid);
+    if (data == null) data = false;
     this.setState({ classes: data });
   };
   componentDidMount() {
     this.getClass();
   }
   renderClass = (classes) => {
-    if (classes == null) return <h2>No Class</h2>;
+    const { status } = this.context;
+    if (classes == false) return <h2>No Class</h2>;
     let temp = classes.map((val, idx) => {
       return (
         <Card
@@ -67,35 +68,38 @@ class Classes extends Component {
         </Card>
       );
     });
-    temp.push(
-      <Card className="customCard" key={"add"} type="inner" title="Add Class">
-        <Form onFinish={this.createClass} layout="inline" name="dynamic_rule">
-          <Form.Item
-            name="className"
-            rules={[
-              {
-                required: true,
-                message: "Please input Class Name",
-              },
-            ]}
-          >
-            <Input
-              className="infoInput"
-              placeholder="Please input Class Name"
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              className="addButton"
-              htmlType="submit"
-              type="primary"
-              shape="circle"
-              icon={<PlusOutlined />}
-            />
-          </Form.Item>
-        </Form>
-      </Card>
-    );
+
+    if (status.role == true) {
+      temp.push(
+        <Card className="customCard" key={"add"} type="inner" title="Add Class">
+          <Form onFinish={this.createClass} layout="inline" name="dynamic_rule">
+            <Form.Item
+              name="className"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input Class Name",
+                },
+              ]}
+            >
+              <Input
+                className="infoInput"
+                placeholder="Please input Class Name"
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                className="addButton"
+                htmlType="submit"
+                type="primary"
+                shape="circle"
+                icon={<PlusOutlined />}
+              />
+            </Form.Item>
+          </Form>
+        </Card>
+      );
+    }
     return temp;
   };
   giveRole = () => {
@@ -111,6 +115,7 @@ class Classes extends Component {
 
   render() {
     const { classes } = this.state;
+    console.log(classes);
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <SiderBar state={this.props.location.state} />
