@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import "./App.css";
-import "./ui.css";
 import "antd/dist/antd.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import Home from "./Home";
@@ -11,7 +10,7 @@ import SelectRole from "./SelectRole";
 import PrivateRoute from "../utils/PrivateRoute";
 import ExtraInfo from "./ExtraInfo";
 import Classes from "./Classes";
-import Assigment from "./Assigment";
+import Assessment from "./Assessment";
 class App extends Component {
   state = {};
   render() {
@@ -20,7 +19,7 @@ class App extends Component {
         <AuthProvider>
           <PrivateRoute exact path="/" component={Home} />
           <Route exact path="/classes" component={Classes} />
-          <Route exact path="/assigment" component={Assigment} />
+          <Route exact path="/assessment" component={Assessment} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/main" component={Main} />
           <Route exact path="/selectrole" component={SelectRole} />

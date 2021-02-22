@@ -100,6 +100,7 @@ button ~ button {
 
 .infoInput {
   width: 50vh;
+  margin: 1vh;
 }
 .info {
   margin: 2vh;
@@ -110,4 +111,12 @@ button ~ button {
   justify-content: center;
   align-items: center;
   height: 7vh;
+}
+
+.addButton {
+  margin: 10px;
+}
+
+.customCard {
+  margin-top: 10px;
 }

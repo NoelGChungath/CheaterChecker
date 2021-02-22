@@ -22,12 +22,6 @@ class Home extends Component {
     return genStr;
   };
 
-  createClass = () => {
-    const { currentUser } = this.context;
-    const str = this.generateCode();
-    addClass(str, currentUser.uid);
-  };
-
   addToClass = async (values) => {
     const { currentUser } = this.context;
     if (values != null) {
@@ -62,7 +56,6 @@ class Home extends Component {
                 status.role == true ? (
                   <div>
                     <h3>Teacher</h3>
-                    <button onClick={this.createClass}>create Class</button>
                   </div>
                 ) : (
                   <div>

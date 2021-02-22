@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { getAllClasses } from "../utils/Firestore";
+import "./ui.css";
+import { addClass, getAllClasses } from "../utils/Firestore";
 import FooterSection from "./FooterSection";
 import HeaderSection from "./HeaderSection";
-import { Layout, Card, Spin } from "antd";
+import { Layout, Card, Spin, Button, Form, Input } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import SiderBar from "./SideBar";
 import { AuthContext } from "../utils/Auth";
 import { Link } from "react-router-dom";
@@ -15,6 +17,23 @@ class Classes extends Component {
     super(props);
     this.state = { classes: undefined };
   }
+  generateCode = () => {
+    const str =
+      "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
+    let genStr = "";
+    for (let i = 0; i < 5; i++) {
+      const randomIndex = Math.floor(Math.random() * str.length);
+      genStr += str[randomIndex];
+    }
+    return genStr;
+  };
+
+  createClass = (values) => {
+    const { currentUser } = this.context;
+    const str = this.generateCode();
+    addClass(str, values.className, currentUser.uid);
+  };
+
   getClass = async () => {
     const { currentUser } = this.context;
     const data = await getAllClasses(currentUser.uid);
@@ -26,20 +45,21 @@ class Classes extends Component {
   }
   renderClass = (classes) => {
     if (classes == null) return <h2>No Class</h2>;
-    return classes.map((val, idx) => {
+    let temp = classes.map((val, idx) => {
       return (
         <Card
+          className="customCard"
           key={idx}
           type="inner"
           title={val.className}
           extra={
             <Link
               to={{
-                pathname: "/assigment",
+                pathname: "/assessment",
                 state: { val, collapse: this.props.location.state },
               }}
             >
-              Assigment
+              Assessment
             </Link>
           }
         >
@@ -47,6 +67,36 @@ class Classes extends Component {
         </Card>
       );
     });
+    temp.push(
+      <Card className="customCard" key={"add"} type="inner" title="Add Class">
+        <Form onFinish={this.createClass} layout="inline" name="dynamic_rule">
+          <Form.Item
+            name="className"
+            rules={[
+              {
+                required: true,
+                message: "Please input Class Name",
+              },
+            ]}
+          >
+            <Input
+              className="infoInput"
+              placeholder="Please input Class Name"
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              className="addButton"
+              htmlType="submit"
+              type="primary"
+              shape="circle"
+              icon={<PlusOutlined />}
+            />
+          </Form.Item>
+        </Form>
+      </Card>
+    );
+    return temp;
   };
   giveRole = () => {
     const { status } = this.context;

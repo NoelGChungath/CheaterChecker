@@ -28,11 +28,11 @@ const addInfo = async (values, uid) => {
   const docRef = db.collection("users").doc(uid);
   await docRef.update(values);
 };
-const addClass = (code, uid) => {
+const addClass = (code, className, uid) => {
   const docRef = db.collection("classes").doc(code);
   let data = {
     classCode: code,
-    className: "Class" + code,
+    className: className,
     owner: uid,
     students: null,
   };
