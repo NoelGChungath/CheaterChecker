@@ -37,6 +37,11 @@ const addClass = (code, className, uid) => {
     students: null,
   };
   docRef.set(data);
+  const asmRef = db.collection("assessment").doc(code);
+  asmRef.set({
+    className: className,
+    assessments: [],
+  });
   addClassToUser(code, uid);
 };
 const joinClass = async (code, uid) => {
@@ -79,15 +84,20 @@ const getUserRole = async (uid) => {
   const data = doc.data();
   return data;
 };
-const getAssigments = async (classCode) => {
-  const docRef = db.collection("assigments").doc(classCode);
+const addAssesment = async (classCode, assessmentObj) => {
+  const docRef = db.collection("assessment").doc(classCode);
+  await docRef.update({
+    assessments: firebase.firestore.FieldValue.arrayUnion(assessmentObj),
+  });
+};
+const getAssesment = async (classCode) => {
+  const docRef = db.collection("assessment").doc(classCode);
   const doc = await docRef.get();
-  let classAr = [];
-  classAr.push(doc.data());
-  return classAr;
+  return doc.data();
 };
 export {
-  getAssigments,
+  getAssesment,
+  addAssesment,
   checkUserExist,
   addUser,
   getUserRole,

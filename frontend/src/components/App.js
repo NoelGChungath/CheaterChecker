@@ -11,6 +11,8 @@ import PrivateRoute from "../utils/PrivateRoute";
 import ExtraInfo from "./ExtraInfo";
 import Classes from "./Classes";
 import Assessment from "./Assessment";
+import CreateRoom from "./room/createRoom";
+import Room from "./room/room";
 class App extends Component {
   state = {};
   render() {
@@ -18,12 +20,14 @@ class App extends Component {
       <Router>
         <AuthProvider>
           <PrivateRoute exact path="/" component={Home} />
-          <Route exact path="/classes" component={Classes} />
+          <PrivateRoute exact path="/classes" component={Classes} />
           <Route exact path="/assessment" component={Assessment} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/main" component={Main} />
           <Route exact path="/selectrole" component={SelectRole} />
           <Route exact path="/extrainfo" component={ExtraInfo} />
+          <Route path="/t" exact component={CreateRoom} />
+          <Route path="/room/:roomID" component={Room} />
         </AuthProvider>
       </Router>
     );

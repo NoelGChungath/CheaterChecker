@@ -32,6 +32,7 @@ class Classes extends Component {
     const { currentUser } = this.context;
     const str = this.generateCode();
     addClass(str, values.className, currentUser.uid);
+    this.getClass();
   };
 
   getClass = async () => {
@@ -46,7 +47,7 @@ class Classes extends Component {
   renderClass = (classes) => {
     const { status } = this.context;
     if (classes == false) return <h2>No Class</h2>;
-    let temp = classes.map((val, idx) => {
+    return classes.map((val, idx) => {
       return (
         <Card
           className="customCard"
@@ -68,45 +69,53 @@ class Classes extends Component {
         </Card>
       );
     });
-
-    if (status.role == true) {
-      temp.push(
-        <Card className="customCard" key={"add"} type="inner" title="Add Class">
-          <Form onFinish={this.createClass} layout="inline" name="dynamic_rule">
-            <Form.Item
-              name="className"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input Class Name",
-                },
-              ]}
-            >
-              <Input
-                className="infoInput"
-                placeholder="Please input Class Name"
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button
-                className="addButton"
-                htmlType="submit"
-                type="primary"
-                shape="circle"
-                icon={<PlusOutlined />}
-              />
-            </Form.Item>
-          </Form>
-        </Card>
-      );
-    }
-    return temp;
   };
-  giveRole = () => {
+  getRole = () => {
     const { status } = this.context;
     if (status != null) {
       if (status.role) {
-        return <div>Teacher</div>;
+        return (
+          <div>
+            {" "}
+            <Card
+              className="customCard"
+              key={"add"}
+              type="inner"
+              title="Add Class"
+            >
+              <Form
+                onFinish={this.createClass}
+                layout="inline"
+                name="dynamic_rule"
+              >
+                <Form.Item
+                  name="className"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input Class Name",
+                    },
+                  ]}
+                >
+                  <Input
+                    className="infoInput"
+                    placeholder="Please input Class Name"
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    className="addButton"
+                    htmlType="submit"
+                    type="primary"
+                    shape="circle"
+                    icon={<PlusOutlined />}
+                  />
+                </Form.Item>
+              </Form>
+            </Card>
+            Teacher
+          </div>
+        );
       } else {
         return <div>Student</div>;
       }
@@ -130,7 +139,7 @@ class Classes extends Component {
               ) : (
                 this.renderClass(classes)
               )}
-              {this.giveRole()}
+              {this.getRole()}
             </Card>
           </Content>
           <FooterSection />

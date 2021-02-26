@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-class SiderBar extends Component {
+class SideBar extends Component {
   constructor(props) {
     super(props);
     let temp = false;
@@ -74,4 +74,4 @@ class SiderBar extends Component {
   }
 }
 
-export default SiderBar;
+export default SideBar;

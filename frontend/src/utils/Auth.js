@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { app } from "./base";
-import "antd/dist/antd.css";
 import { Spin } from "antd";
 import { checkUserExist, getUserRole } from "./Firestore";
-import { Redirect, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 export const AuthContext = React.createContext();
 
