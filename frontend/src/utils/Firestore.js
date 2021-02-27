@@ -1,5 +1,7 @@
 import { db } from "./base";
 import firebase from "firebase/app";
+import { v1 as uuid } from "uuid";
+
 const checkUserExist = async (uid) => {
   const docRef = db.collection("users").doc(uid);
   const doc = await docRef.get();
@@ -86,8 +88,12 @@ const getUserRole = async (uid) => {
 };
 const addAssesment = async (classCode, assessmentObj) => {
   const docRef = db.collection("assessment").doc(classCode);
+  const roomId = uuid();
   await docRef.update({
-    assessments: firebase.firestore.FieldValue.arrayUnion(assessmentObj),
+    assessments: firebase.firestore.FieldValue.arrayUnion({
+      assessmentObj,
+      roomId,
+    }),
   });
 };
 const getAssesment = async (classCode) => {

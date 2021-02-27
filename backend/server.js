@@ -8,6 +8,8 @@ require("dotenv").config();
 const users = {};
 const socketToRoom = {};
 
+app.use(express.static("public"));
+
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => console.log("server is running on port 8000"));
 

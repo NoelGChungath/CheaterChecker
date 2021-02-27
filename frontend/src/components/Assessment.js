@@ -7,6 +7,7 @@ import { Layout, Card, Spin, Button, Form, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import SideBar from "./SideBar";
 import { AuthContext } from "../utils/Auth";
+import { Link } from "react-router-dom";
 
 const { Content } = Layout;
 
@@ -23,7 +24,12 @@ class Assessment extends Component {
     const { classInfo } = this.state;
     const classCode = classInfo.classCode;
     let data = await getAssesment(classCode);
-    if (data == null) data = false;
+    console.log(data);
+    console.log(data.assessments.length);
+    if (data.assessments.length == 0) {
+      console.log("dfd");
+      data = false;
+    }
     this.setState({ assessments: data });
   };
   createAssessment = async (value) => {
@@ -35,11 +41,26 @@ class Assessment extends Component {
   renderAssessments = () => {
     const { assessments } = this.state;
 
-    if (assessments == null) return null;
+    if (assessments == false) return <h2>No Assessments</h2>;
     return assessments.assessments.map((val, idx) => {
+      const { assessmentObj, roomId } = val;
       return (
-        <Card className="customCard" key={idx} type="inner" title={val}>
-          {val}
+        <Card
+          className="customCard"
+          key={idx}
+          type="inner"
+          title={assessmentObj}
+          extra={
+            <Link
+              to={{
+                pathname: `/room/${roomId}`,
+              }}
+            >
+              Join Assessment Room
+            </Link>
+          }
+        >
+          {assessmentObj}
         </Card>
       );
     });
