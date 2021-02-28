@@ -1,1 +1,0 @@
-web: PROD=true node server.js
