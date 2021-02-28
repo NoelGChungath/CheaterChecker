@@ -20,7 +20,7 @@ class App extends Component {
         <AuthProvider>
           <PrivateRoute exact path="/" component={Home} />
           <PrivateRoute exact path="/classes" component={Classes} />
-          <PrivateRoute path="/room/:roomID" component={Room} />
+          <Route path="/room/:roomID/:role/:code/:socketId" component={Room} />
           <Route exact path="/assessment" component={Assessment} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/main" component={Main} />

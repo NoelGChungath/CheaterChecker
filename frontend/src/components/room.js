@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
+import { addTeacherSocket } from "../utils/Firestore";
 
 const Container = styled.div`
   padding: 20px;
@@ -10,11 +11,6 @@ const Container = styled.div`
   width: 90%;
   margin: auto;
   flex-wrap: wrap;
-`;
-
-const StyledVideo = styled.video`
-  height: 40%;
-  width: 50%;
 `;
 
 const Video = (props) => {
@@ -26,12 +22,20 @@ const Video = (props) => {
     });
   }, []);
 
-  return <StyledVideo playsInline autoPlay ref={ref} />;
+  return (
+    <video
+      width={vid.width}
+      height={vid.height}
+      playsInline
+      autoPlay
+      ref={ref}
+    ></video>
+  );
 };
 
-const videoConstraints = {
-  height: window.innerHeight / 2,
-  width: window.innerWidth / 2,
+let vid = {
+  height: window.innerHeight / 1,
+  width: window.innerWidth / 1,
 };
 
 const Room = (props) => {
@@ -40,23 +44,44 @@ const Room = (props) => {
   const userVideo = useRef();
   const peersRef = useRef([]);
   const roomID = props.match.params.roomID;
-
+  const role = props.match.params.role;
+  const code = props.match.params.code;
+  const socketId = props.match.params.socketId;
+  let counter = 1;
   useEffect(() => {
     socketRef.current = io.connect("/");
     navigator.mediaDevices
-      .getDisplayMedia({ cursor: true, videoBitsPerSecond: 2 * 1000 })
+      .getDisplayMedia({
+        video: {
+          width: 1280,
+          height: 720,
+          frameRate: {
+            ideal: 10,
+            max: 15,
+          },
+        },
+        cursor: true,
+        mimeType: "video/webm; codecs=vp9",
+      })
       .then((stream) => {
         userVideo.current.srcObject = stream;
         socketRef.current.emit("join room", roomID);
+
+        if (role == "true") {
+          addSocket(socketRef.current.id);
+        }
         socketRef.current.on("all users", (users) => {
           const peers = [];
+
           users.forEach((userID) => {
-            const peer = createPeer(userID, socketRef.current.id, stream);
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            });
-            peers.push(peer);
+            if (socketId == userID) {
+              const peer = createPeer(userID, socketRef.current.id, stream);
+              peersRef.current.push({
+                peerID: userID,
+                peer,
+              });
+              peers.push(peer);
+            }
           });
           setPeers(peers);
         });
@@ -67,6 +92,11 @@ const Room = (props) => {
             peerID: payload.callerID,
             peer,
           });
+          counter++;
+          vid = {
+            height: window.innerHeight / counter,
+            width: window.innerWidth / counter,
+          };
 
           setPeers((users) => [...users, peer]);
         });
@@ -77,6 +107,10 @@ const Room = (props) => {
         });
       });
   }, []);
+
+  const addSocket = (id) => {
+    addTeacherSocket(id, code);
+  };
 
   function createPeer(userToSignal, callerID, stream) {
     const peer = new Peer({
@@ -114,10 +148,18 @@ const Room = (props) => {
 
   return (
     <Container>
-      <StyledVideo muted ref={userVideo} autoPlay playsInline />
-      {peers.map((peer, index) => {
-        return <Video key={index} peer={peer} />;
-      })}
+      <video
+        width={vid.width}
+        height={vid.height}
+        playsInline
+        autoPlay
+        ref={userVideo}
+      ></video>
+      {role == "true"
+        ? peers.map((peer, index) => {
+            return <Video key={index} peer={peer} />;
+          })
+        : ""}
     </Container>
   );
 };

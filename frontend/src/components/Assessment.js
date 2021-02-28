@@ -39,11 +39,20 @@ class Assessment extends Component {
     this.getAllAssessment();
   };
   renderAssessments = () => {
-    const { assessments } = this.state;
-
+    const { assessments, classInfo } = this.state;
+    const { status } = this.context;
+    const classCode = classInfo.classCode;
     if (assessments == false) return <h2>No Assessments</h2>;
+    const socketId = assessments.sockedId;
+    console.log(socketId);
+
     return assessments.assessments.map((val, idx) => {
       const { assessmentObj, roomId } = val;
+      if (socketId == undefined) {
+        console.log("out");
+      } else {
+        console.log("in");
+      }
       return (
         <Card
           className="customCard"
@@ -51,13 +60,17 @@ class Assessment extends Component {
           type="inner"
           title={assessmentObj}
           extra={
-            <Link
-              to={{
-                pathname: `/room/${roomId}`,
-              }}
-            >
-              Join Assessment Room
-            </Link>
+            socketId != undefined || status.role == true ? (
+              <Link
+                to={{
+                  pathname: `/room/${roomId}/${status.role}/${classCode}/${socketId}`,
+                }}
+              >
+                Join Assessment Room
+              </Link>
+            ) : (
+              <Link disabled>{socketId}Assessment Not Open</Link>
+            )
           }
         >
           {assessmentObj}

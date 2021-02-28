@@ -101,7 +101,17 @@ const getAssesment = async (classCode) => {
   const doc = await docRef.get();
   return doc.data();
 };
+
+const addTeacherSocket = async (sockedId, classCode) => {
+  console.log("firebase");
+  console.log(sockedId);
+  const docRef = db.collection("assessment").doc(classCode);
+
+  await docRef.update({ sockedId });
+};
+
 export {
+  addTeacherSocket,
   getAssesment,
   addAssesment,
   checkUserExist,

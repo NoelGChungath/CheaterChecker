@@ -3,12 +3,14 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
+const cors = require("cors");
 const io = socket(server);
 require("dotenv").config();
 const users = {};
 const socketToRoom = {};
 
 app.use(express.static("public"));
+app.use(cors());
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => console.log("server is running on port 8000"));
