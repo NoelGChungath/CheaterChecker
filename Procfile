@@ -1,1 +1,1 @@
-web: yarn start
+web: PROD=true node server.js
