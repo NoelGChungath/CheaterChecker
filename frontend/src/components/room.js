@@ -48,8 +48,12 @@ const Room = (props) => {
   const code = props.match.params.code;
   const socketId = props.match.params.socketId;
   let counter = 1;
+  const endPoint = {
+    local: "http://localhost:8000/",
+    prod: "https://isugapi.herokuapp.com/",
+  };
   useEffect(() => {
-    socketRef.current = io.connect("/");
+    socketRef.current = io.connect(endPoint.prod);
     navigator.mediaDevices
       .getDisplayMedia({
         video: {
@@ -103,6 +107,7 @@ const Room = (props) => {
 
         socketRef.current.on("receiving returned signal", (payload) => {
           const item = peersRef.current.find((p) => p.peerID === payload.id);
+          console.log(item);
           item.peer.signal(payload.signal);
         });
       });
@@ -113,6 +118,7 @@ const Room = (props) => {
   };
 
   function createPeer(userToSignal, callerID, stream) {
+    console.log(stream);
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -120,6 +126,7 @@ const Room = (props) => {
     });
 
     peer.on("signal", (signal) => {
+      console.log(signal);
       socketRef.current.emit("sending signal", {
         userToSignal,
         callerID,
@@ -131,6 +138,7 @@ const Room = (props) => {
   }
 
   function addPeer(incomingSignal, callerID, stream) {
+    console.log(stream);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -138,6 +146,7 @@ const Room = (props) => {
     });
 
     peer.on("signal", (signal) => {
+      console.log(signal);
       socketRef.current.emit("returning signal", { signal, callerID });
     });
 

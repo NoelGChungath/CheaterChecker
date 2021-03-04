@@ -8,6 +8,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import SideBar from "./SideBar";
 import { AuthContext } from "../utils/Auth";
 import { Link } from "react-router-dom";
+import { v1 as uuid } from "uuid";
 
 const { Content } = Layout;
 
@@ -24,19 +25,23 @@ class Assessment extends Component {
     const { classInfo } = this.state;
     const classCode = classInfo.classCode;
     let data = await getAssesment(classCode);
-    console.log(data);
-    console.log(data.assessments.length);
     if (data.assessments.length == 0) {
-      console.log("dfd");
       data = false;
     }
     this.setState({ assessments: data });
   };
-  createAssessment = async (value) => {
-    const { classInfo } = this.state;
+  createAssessment = (value) => {
+    let { assessments, classInfo } = this.state;
     const classCode = classInfo.classCode;
-    const data = await addAssesment(classCode, value.assessmentName);
-    this.getAllAssessment();
+    const roomId = uuid();
+    const assessmentObj = value.assessmentName;
+    addAssesment(classCode, assessmentObj, roomId);
+    if (assessments == false) {
+      assessments = { assessments: [{ assessmentObj, roomId }] };
+    } else {
+      assessments.assessments.push({ assessmentObj, roomId });
+    }
+    this.setState({ assessments });
   };
   renderAssessments = () => {
     const { assessments, classInfo } = this.state;
@@ -44,15 +49,9 @@ class Assessment extends Component {
     const classCode = classInfo.classCode;
     if (assessments == false) return <h2>No Assessments</h2>;
     const socketId = assessments.sockedId;
-    console.log(socketId);
 
     return assessments.assessments.map((val, idx) => {
       const { assessmentObj, roomId } = val;
-      if (socketId == undefined) {
-        console.log("out");
-      } else {
-        console.log("in");
-      }
       return (
         <Card
           className="customCard"

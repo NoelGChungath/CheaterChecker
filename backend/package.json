@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"PROD=true node server.js",
-    "postinstall":"cd ./frontend && yarn"
+    "start": "node server.js"
   },
   "author": "Noel G",
   "license": "ISC",

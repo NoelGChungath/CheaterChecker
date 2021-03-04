@@ -30,14 +30,27 @@ class Classes extends Component {
 
   createClass = (values) => {
     const { currentUser } = this.context;
+    let { classes } = this.state;
     const str = this.generateCode();
     addClass(str, values.className, currentUser.uid);
-    this.getClass();
+
+    let data = {
+      classCode: str,
+      className: values.className,
+      owner: currentUser.uid,
+      students: null,
+    };
+    if (classes == false) {
+      classes = [data];
+    } else {
+      classes.push(data);
+    }
+    this.setState(classes);
   };
 
   getClass = async () => {
-    const { currentUser } = this.context;
-    let data = await getAllClasses(currentUser.uid);
+    const { currentUser, status } = this.context;
+    let data = await getAllClasses(currentUser.uid, status.Classes);
     if (data == null) data = false;
     this.setState({ classes: data });
   };
@@ -65,7 +78,7 @@ class Classes extends Component {
             </Link>
           }
         >
-          {val.ownerName}
+          {val.owner}
         </Card>
       );
     });
@@ -124,7 +137,6 @@ class Classes extends Component {
 
   render() {
     const { classes } = this.state;
-    console.log(classes);
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <SiderBar state={this.props.location.state} />

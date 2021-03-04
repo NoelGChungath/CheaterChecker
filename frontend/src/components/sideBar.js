@@ -15,8 +15,6 @@ class SideBar extends Component {
   constructor(props) {
     super(props);
     let temp = false;
-    console.log("dffd");
-    console.log(this.props);
     if (this.props["state"] != undefined) {
       temp = this.props.state;
     }
@@ -74,4 +72,4 @@ class SideBar extends Component {
   }
 }
 
-export default SideBar;
+export default React.memo(SideBar);

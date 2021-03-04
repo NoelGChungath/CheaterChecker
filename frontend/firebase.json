@@ -1,5 +1,12 @@
 {
   "hosting": {
+    "headers": [ {
+      "source" : "index.html",
+      "headers" : [ {
+        "key" : "Access-Control-Allow-Origin",
+        "value" : "*"
+      } ]
+    } ],
     "public": "build",
     "ignore": [
       "firebase.json",

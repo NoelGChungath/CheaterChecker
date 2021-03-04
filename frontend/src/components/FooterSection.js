@@ -12,4 +12,4 @@ const FooterSection = () => {
   );
 };
 
-export default FooterSection;
+export default React.memo(FooterSection);

@@ -1,6 +1,5 @@
 import { db } from "./base";
 import firebase from "firebase/app";
-import { v1 as uuid } from "uuid";
 
 const checkUserExist = async (uid) => {
   const docRef = db.collection("users").doc(uid);
@@ -57,22 +56,17 @@ const joinClass = async (code, uid) => {
     return err;
   }
 };
-const getAllClasses = async (uid) => {
-  const docRef = db.collection("users").doc(uid);
-  const doc = await docRef.get();
-  const { Classes } = doc.data();
-  if (Classes == undefined) return null;
-  const classAr = [];
-  for (const code of Classes) {
-    const classRef = db.collection("classes").doc(code);
-    const docData = await classRef.get();
-    const classData = docData.data();
-    const ownerData = await getUserRole(classData.owner);
-    classData["ownerName"] =
-      ownerData["nickname"] != undefined ? ownerData.nickname : "Not Available";
-    classAr.push(classData);
-  }
-  return classAr;
+const getAllClasses = async (uid, Classes) => {
+  var start = new Date().getTime();
+  const docRef = db.collection("classes");
+  const query = docRef.where("owner", "==", uid);
+  const data = await query.get();
+  const classes = data.docs.map((doc) => {
+    return doc.data();
+  });
+  var elapsed = new Date().getTime() - start;
+  console.log(elapsed);
+  return classes;
 };
 const addClassToUser = async (code, uid) => {
   const docRef = db.collection("users").doc(uid);
@@ -86,9 +80,9 @@ const getUserRole = async (uid) => {
   const data = doc.data();
   return data;
 };
-const addAssesment = async (classCode, assessmentObj) => {
+const addAssesment = async (classCode, assessmentObj, roomId) => {
   const docRef = db.collection("assessment").doc(classCode);
-  const roomId = uuid();
+
   await docRef.update({
     assessments: firebase.firestore.FieldValue.arrayUnion({
       assessmentObj,
@@ -103,8 +97,6 @@ const getAssesment = async (classCode) => {
 };
 
 const addTeacherSocket = async (sockedId, classCode) => {
-  console.log("firebase");
-  console.log(sockedId);
   const docRef = db.collection("assessment").doc(classCode);
 
   await docRef.update({ sockedId });

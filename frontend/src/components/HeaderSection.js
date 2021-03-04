@@ -26,4 +26,4 @@ const HeaderSection = () => {
   );
 };
 
-export default HeaderSection;
+export default React.memo(HeaderSection);
