@@ -46,6 +46,12 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("tt", (payload) => {
+    io.to(payload.id).emit("t", {
+      signal: payload.data,
+    });
+  });
+
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];

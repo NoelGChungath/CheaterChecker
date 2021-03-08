@@ -47,25 +47,29 @@ const addClass = (code, className, uid) => {
 };
 const joinClass = async (code, uid) => {
   try {
-    const classesRef = db.collection("classes").doc(code);
+    console.log(code, uid);
+    const classesRef = db.collection("classes").doc(code.trim());
     await classesRef.update({
       students: firebase.firestore.FieldValue.arrayUnion(uid),
     });
     addClassToUser(code, uid);
   } catch (err) {
+    console.log(err);
     return err;
   }
 };
-const getAllClasses = async (uid, Classes) => {
-  var start = new Date().getTime();
+const getAllClasses = async (uid, studentOrTeacher) => {
   const docRef = db.collection("classes");
-  const query = docRef.where("owner", "==", uid);
+  let query = null;
+  if (studentOrTeacher == true) {
+    query = docRef.where("owner", "==", uid);
+  } else {
+    query = docRef.where("students", "array-contains", uid);
+  }
   const data = await query.get();
   const classes = data.docs.map((doc) => {
     return doc.data();
   });
-  var elapsed = new Date().getTime() - start;
-  console.log(elapsed);
   return classes;
 };
 const addClassToUser = async (code, uid) => {
@@ -80,13 +84,58 @@ const getUserRole = async (uid) => {
   const data = doc.data();
   return data;
 };
+function convertMS(ms) {
+  var d, h, m, s;
+  s = Math.floor(ms / 1000);
+  m = Math.floor(s / 60);
+  s = s % 60;
+  h = Math.floor(m / 60);
+  m = m % 60;
+  d = Math.floor(h / 24);
+  h = h % 24;
+  let date = "";
+  if (d != 0) {
+    date += d + " days, ";
+  }
+  if (h != 0) {
+    date += h + " hours, ";
+  }
+  if (m != 0) {
+    date += m + " minutes, ";
+  }
+  if (s != 0) {
+    date += s + " seconds ";
+  }
+
+  return date;
+}
+const getLatestAssements = async (classes) => {
+  const docRef = db.collection("assessment");
+  const query = docRef.where("classCode", "in", classes);
+  const data = await query.get();
+  const currentDate = new Date();
+  let filteredData = [];
+  data.docs.map((doc) => {
+    const tempData = doc.data();
+    tempData.assessments.map((val) => {
+      filteredData.push({ data: val, class: tempData.className });
+      var storedDate = new Date(val.date);
+      var elapsedTime = currentDate.getTime() - storedDate.getTime();
+      val.elaspedTime = convertMS(elapsedTime);
+    });
+  });
+  return filteredData;
+};
+
 const addAssesment = async (classCode, assessmentObj, roomId) => {
   const docRef = db.collection("assessment").doc(classCode);
-
+  const date = new Date().toString();
   await docRef.update({
+    classCode,
     assessments: firebase.firestore.FieldValue.arrayUnion({
       assessmentObj,
       roomId,
+      date,
     }),
   });
 };
@@ -103,6 +152,7 @@ const addTeacherSocket = async (sockedId, classCode) => {
 };
 
 export {
+  getLatestAssements,
   addTeacherSocket,
   getAssesment,
   addAssesment,

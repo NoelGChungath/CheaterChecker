@@ -3,6 +3,8 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
 import { addTeacherSocket } from "../utils/Firestore";
+import CosineSimilar from "../utils/algoritims";
+import pearson from "../utils/algoritims";
 
 const Container = styled.div`
   padding: 20px;
@@ -40,6 +42,7 @@ let vid = {
 
 const Room = (props) => {
   const [peers, setPeers] = useState([]);
+  let oldImage = [];
   const socketRef = useRef();
   const userVideo = useRef();
   const peersRef = useRef([]);
@@ -53,7 +56,7 @@ const Room = (props) => {
     prod: "https://isugapi.herokuapp.com/",
   };
   useEffect(() => {
-    socketRef.current = io.connect(endPoint.prod);
+    socketRef.current = io.connect(endPoint.local);
     navigator.mediaDevices
       .getDisplayMedia({
         video: {
@@ -69,6 +72,31 @@ const Room = (props) => {
       })
       .then((stream) => {
         userVideo.current.srcObject = stream;
+
+        if (role == "false") {
+          const canvas = document.getElementById("canvas");
+          const ctx = canvas.getContext("2d");
+          requestAnimationFrame(async function loop() {
+            await new Promise((r) => setTimeout(r, 3000));
+            ctx.drawImage(userVideo.current, 0, 0, 16, 12);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            const data = imageData.data;
+            const result = pearson(data, oldImage);
+            console.log(socketId);
+
+            socketRef.current.emit("tt", { data: result, id: socketId });
+
+            console.log(result);
+            oldImage = data;
+            requestAnimationFrame(loop);
+          });
+        }
+
         socketRef.current.emit("join room", roomID);
 
         if (role == "true") {
@@ -88,6 +116,10 @@ const Room = (props) => {
             }
           });
           setPeers(peers);
+        });
+
+        socketRef.current.on("t", (payload) => {
+          console.log(payload);
         });
 
         socketRef.current.on("user joined", (payload) => {
@@ -157,6 +189,7 @@ const Room = (props) => {
 
   return (
     <Container>
+      <canvas id="canvas" width="16" height="12"></canvas>
       <video
         width={vid.width}
         height={vid.height}

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { AuthContext } from "../utils/Auth";
-import { addClass, joinClass } from "../utils/Firestore";
+import { getLatestAssements, joinClass } from "../utils/Firestore";
 import "./ui.css";
-import { Layout, Breadcrumb, Button, Form, Input } from "antd";
+import { Layout, Card, Spin, Button, Form, Input } from "antd";
 import SiderBar from "./SideBar";
 import FooterSection from "./FooterSection";
 import HeaderSection from "./HeaderSection";
@@ -11,6 +11,10 @@ const { Content } = Layout;
 
 class Home extends Component {
   static contextType = AuthContext;
+  constructor(props) {
+    super(props);
+    this.state = { latest: undefined };
+  }
   generateCode = () => {
     const str =
       "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
@@ -20,6 +24,33 @@ class Home extends Component {
       genStr += str[randomIndex];
     }
     return genStr;
+  };
+
+  getLatestAssesment = async () => {
+    const { status } = this.context;
+    let latest = await getLatestAssements(status.Classes);
+    if (latest.length == 0) latest = false;
+    console.log(latest);
+    this.setState({ latest });
+  };
+
+  renderLatest = (latestAsmt) => {
+    if (latestAsmt == false) return <h3>No Latest Assessment</h3>;
+    console.log("_________________________________________________");
+    console.log(latestAsmt);
+    return latestAsmt.map((val, idx) => {
+      return (
+        <Card
+          className="customCard"
+          key={idx}
+          type="inner"
+          title={val.class}
+          extra={val.data.elaspedTime}
+        >
+          {val.data.assessmentObj}
+        </Card>
+      );
+    });
   };
 
   addToClass = async (values) => {
@@ -38,20 +69,27 @@ class Home extends Component {
 
   render() {
     const { status } = this.context;
+    const { latest } = this.state;
+    if (status != null && latest == undefined) {
+      this.getLatestAssesment();
+    }
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <SiderBar state={this.props.location.state} />
         <Layout className="site-layout">
           <HeaderSection />
           <Content style={{ margin: "0 16px" }}>
-            <Breadcrumb style={{ margin: "16px 0" }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
             <div
               className="site-layout-background"
               style={{ padding: 24, minHeight: 360 }}
             >
+              {latest == undefined ? (
+                <div className="loader">
+                  <Spin size="large" tip="Loading..." />
+                </div>
+              ) : (
+                this.renderLatest(latest)
+              )}
               {status != null ? (
                 status.role == true ? (
                   <div>

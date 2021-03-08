@@ -50,7 +50,7 @@ class Classes extends Component {
 
   getClass = async () => {
     const { currentUser, status } = this.context;
-    let data = await getAllClasses(currentUser.uid, status.Classes);
+    let data = await getAllClasses(currentUser.uid, status.role);
     if (data == null) data = false;
     this.setState({ classes: data });
   };
