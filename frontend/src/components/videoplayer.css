@@ -1,0 +1,3 @@
+video::-webkit-slider-thumb {
+  display: none !important;
+}

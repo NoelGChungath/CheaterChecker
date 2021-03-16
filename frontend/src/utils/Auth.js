@@ -9,6 +9,7 @@ export const AuthContext = React.createContext();
 class AuthProvider extends Component {
   state = {
     currentUser: null,
+    photoUrl: null,
     loader: true,
     status: null,
     sendUser: false,
@@ -23,9 +24,18 @@ class AuthProvider extends Component {
   componentDidMount() {
     app.auth().onAuthStateChanged((user) => {
       if (user != null) {
-        this.setState({ currentUser: user, loader: false, status: null });
+        this.setState({
+          currentUser: user,
+          loader: false,
+          status: null,
+          photoUrl: user.photoURL,
+        });
       } else {
-        this.setState({ currentUser: user, loader: false });
+        this.setState({
+          currentUser: user,
+          loader: false,
+          photoUrl: user.photoURL,
+        });
       }
     });
   }
@@ -59,7 +69,7 @@ class AuthProvider extends Component {
   }
 
   render() {
-    const { currentUser, loader, status } = this.state;
+    const { currentUser, loader, status, photoUrl } = this.state;
     if (loader) {
       return (
         <div style={this.style}>
@@ -68,7 +78,7 @@ class AuthProvider extends Component {
       );
     } else {
       return (
-        <AuthContext.Provider value={{ currentUser, status }}>
+        <AuthContext.Provider value={{ currentUser, status, photoUrl }}>
           {this.props.children}
         </AuthContext.Provider>
       );

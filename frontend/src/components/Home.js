@@ -30,14 +30,11 @@ class Home extends Component {
     const { status } = this.context;
     let latest = await getLatestAssements(status.Classes);
     if (latest.length == 0) latest = false;
-    console.log(latest);
     this.setState({ latest });
   };
 
   renderLatest = (latestAsmt) => {
     if (latestAsmt == false) return <h3>No Latest Assessment</h3>;
-    console.log("_________________________________________________");
-    console.log(latestAsmt);
     return latestAsmt.map((val, idx) => {
       return (
         <Card

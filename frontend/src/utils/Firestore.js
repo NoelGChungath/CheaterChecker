@@ -29,12 +29,13 @@ const addInfo = async (values, uid) => {
   const docRef = db.collection("users").doc(uid);
   await docRef.update(values);
 };
-const addClass = (code, className, uid) => {
+const addClass = (code, className, uid, room) => {
   const docRef = db.collection("classes").doc(code);
   let data = {
     classCode: code,
     className: className,
     owner: uid,
+    room: room,
     students: null,
   };
   docRef.set(data);
@@ -94,18 +95,23 @@ function convertMS(ms) {
   d = Math.floor(h / 24);
   h = h % 24;
   let date = "";
+  let counter = 0;
   if (d != 0) {
     date += d + " days, ";
+    counter++;
   }
   if (h != 0) {
     date += h + " hours, ";
+    counter++;
   }
+  //if (counter != 2) {
   if (m != 0) {
     date += m + " minutes, ";
   }
   if (s != 0) {
     date += s + " seconds ";
   }
+  //  }
 
   return date;
 }

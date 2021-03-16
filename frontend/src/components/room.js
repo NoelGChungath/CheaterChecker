@@ -3,9 +3,9 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
 import { addTeacherSocket } from "../utils/Firestore";
-import CosineSimilar from "../utils/algoritims";
 import pearson from "../utils/algoritims";
-
+import { Card, Badge } from "antd";
+import "./room.css";
 const Container = styled.div`
   padding: 20px;
   display: flex;
@@ -19,19 +19,26 @@ const Video = (props) => {
   const ref = useRef();
 
   useEffect(() => {
-    props.peer.on("stream", (stream) => {
+    props.peer.peer.on("stream", (stream) => {
       ref.current.srcObject = stream;
     });
   }, []);
 
   return (
-    <video
-      width={vid.width}
-      height={vid.height}
-      playsInline
-      autoPlay
-      ref={ref}
-    ></video>
+    <Card
+      size="small"
+      title={<p id={"d" + props.id}></p>}
+      extra={<p id={props.id}></p>}
+      style={{ width: vid.width, height: vid.height }}
+    >
+      <video
+        width={vid.width}
+        height={vid.height}
+        playsInline
+        autoPlay
+        ref={ref}
+      ></video>
+    </Card>
   );
 };
 
@@ -46,13 +53,13 @@ const Room = (props) => {
   const socketRef = useRef();
   const userVideo = useRef();
   const peersRef = useRef([]);
-  const roomID = props.match.params.roomID;
-  const role = props.match.params.role;
-  const code = props.match.params.code;
-  const socketId = props.match.params.socketId;
+  const roomID = props.state.roomID;
+  const role = props.state.role;
+  const code = props.state.classCode;
+  const socketId = props.state.socketId;
   let counter = 1;
   const endPoint = {
-    local: "http://localhost:8000/",
+    local: "http://192.168.0.35:8000/",
     prod: "https://isugapi.herokuapp.com/",
   };
   useEffect(() => {
@@ -87,10 +94,15 @@ const Room = (props) => {
             );
             const data = imageData.data;
             const result = pearson(data, oldImage);
-            console.log(socketId);
 
-            socketRef.current.emit("tt", { data: result, id: socketId });
-
+            const date = new Date().getTime();
+            socketRef.current.emit("sendMsg", {
+              data: result,
+              id: socketId,
+              myId: socketRef.current.id,
+              time: date,
+              name: "name",
+            });
             console.log(result);
             oldImage = data;
             requestAnimationFrame(loop);
@@ -112,14 +124,25 @@ const Room = (props) => {
                 peerID: userID,
                 peer,
               });
-              peers.push(peer);
+              peers.push({ peer, id: userID });
             }
           });
           setPeers(peers);
         });
+        socketRef.current.on("cheater", (payload) => {
+          let data = document.getElementById(payload.myId);
 
-        socketRef.current.on("t", (payload) => {
-          console.log(payload);
+          let count = document.getElementById("d" + payload.myId);
+          data.innerText = "Name: " + payload.myId;
+          console.log(count);
+          if (typeof payload.data === "number") {
+            const percent = parseInt(Math.abs(payload.data * 100 - 100));
+            let isCheating = "";
+            if (percent >= 75) {
+              isCheating = '<div class="blink_me">Cheating !</div>';
+            }
+            count.innerHTML = `<p>Cheating %: ${percent}  ${isCheating}<p>`;
+          }
         });
 
         socketRef.current.on("user joined", (payload) => {
@@ -134,7 +157,7 @@ const Room = (props) => {
             width: window.innerWidth / counter,
           };
 
-          setPeers((users) => [...users, peer]);
+          setPeers((users) => [...users, { peer, id: payload.callerID }]);
         });
 
         socketRef.current.on("receiving returned signal", (payload) => {
@@ -199,7 +222,7 @@ const Room = (props) => {
       ></video>
       {role == "true"
         ? peers.map((peer, index) => {
-            return <Video key={index} peer={peer} />;
+            return <Video key={index} id={peer.id} peer={peer} />;
           })
         : ""}
     </Container>

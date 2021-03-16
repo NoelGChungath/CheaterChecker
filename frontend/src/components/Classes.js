@@ -8,7 +8,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import SiderBar from "./SideBar";
 import { AuthContext } from "../utils/Auth";
 import { Link } from "react-router-dom";
-
+import { v1 as uuid } from "uuid";
 const { Content } = Layout;
 
 class Classes extends Component {
@@ -32,7 +32,8 @@ class Classes extends Component {
     const { currentUser } = this.context;
     let { classes } = this.state;
     const str = this.generateCode();
-    addClass(str, values.className, currentUser.uid);
+    const room = uuid();
+    addClass(str, values.className, currentUser.uid, room);
 
     let data = {
       classCode: str,
@@ -68,14 +69,26 @@ class Classes extends Component {
           type="inner"
           title={val.className}
           extra={
-            <Link
-              to={{
-                pathname: "/assessment",
-                state: { val, collapse: this.props.location.state },
-              }}
-            >
-              Assessment
-            </Link>
+            <div>
+              <div>
+                <Link
+                  to={{
+                    pathname: `/whiteboard`,
+                    state: { room: val.roomId, role: status.role },
+                  }}
+                >
+                  Whiteboard
+                </Link>
+              </div>
+              <Link
+                to={{
+                  pathname: "/assessment",
+                  state: { val, collapse: this.props.location.state },
+                }}
+              >
+                Assessment
+              </Link>
+            </div>
           }
         >
           {val.owner}
@@ -89,7 +102,6 @@ class Classes extends Component {
       if (status.role) {
         return (
           <div>
-            {" "}
             <Card
               className="customCard"
               key={"add"}
@@ -144,6 +156,7 @@ class Classes extends Component {
           <HeaderSection />
           <Content style={{ margin: "0 16px" }}>
             <Card title="Classes">
+              {" "}
               {classes == undefined ? (
                 <div className="loader">
                   <Spin size="large" tip="Loading..." />

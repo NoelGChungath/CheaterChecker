@@ -62,7 +62,13 @@ class Assessment extends Component {
             socketId != undefined || status.role == true ? (
               <Link
                 to={{
-                  pathname: `/room/${roomId}/${status.role}/${classCode}/${socketId}`,
+                  pathname: `/room`,
+                  state: {
+                    roomId,
+                    role: status.role,
+                    classCode,
+                    socketId,
+                  },
                 }}
               >
                 Join Assessment Room

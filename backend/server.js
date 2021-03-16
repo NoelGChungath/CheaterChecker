@@ -46,9 +46,22 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("tt", (payload) => {
-    io.to(payload.id).emit("t", {
-      signal: payload.data,
+  socket.on("sendMsg", (payload) => {
+    console.log(payload);
+    io.to(payload.id).emit("cheater", {
+      data: payload.data,
+      name: payload.name,
+      id: payload.id,
+      myId: payload.myId,
+      date: payload.time,
+    });
+  });
+
+  socket.on("coord", (payload) => {
+    io.emit("sendCoord", {
+      data: payload.data,
+      settings: payload.settings,
+      room: payload.room,
     });
   });
 

@@ -1,17 +1,10 @@
 import React, { Component } from "react";
-import { MDBContainer, MDBRow, MDBCol } from "mdbreact";
-
+import { Link } from "react-router-dom";
 class Main extends Component {
   state = {};
 
   render() {
-    return (
-      <MDBContainer className="mt-5 text-center">
-        <MDBRow>
-          <MDBCol></MDBCol>
-        </MDBRow>
-      </MDBContainer>
-    );
+    return <Link to="/login">Login</Link>;
   }
 }
 
