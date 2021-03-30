@@ -1,3 +1,8 @@
+//Noel Gregory
+//2021-03-29
+//This class will create a login page
+
+//imports
 import React, { Component } from "react";
 import "./ui.css";
 import { app } from "../utils/base.js";
@@ -7,16 +12,18 @@ import Navbar from "./Navbar";
 import { Layout, Steps } from "antd";
 import FooterSection from "./FooterSection";
 const { Content } = Layout;
-const { Step } = Steps;
 
 class Login extends Component {
   static contextType = AuthContext;
 
+  //This function will handle gooLogin
   googleLogin = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    const raw = app.auth().signInWithRedirect(provider);
-  };
+    app.auth().signInWithRedirect(provider);
+  }; //end googleLogin
 
+  //This function will render the login page
+  //return:JSX:returns thr login page
   render() {
     return (
       <Layout style={{ minHeight: "100vh" }}>
@@ -27,9 +34,9 @@ class Login extends Component {
             <button
               type="button"
               onClick={this.googleLogin}
-              class="google-button"
+              className="google-button"
             >
-              <span class="google-button__icon">
+              <span className="google-button__icon">
                 <svg viewBox="0 0 366 372" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M125.9 10.2c40.2-13.9 85.3-13.6 125.3 1.1 22.2 8.2 42.5 21 59.9 37.1-5.8 6.3-12.1 12.2-18.1 18.3l-34.2 34.2c-11.3-10.8-25.1-19-40.1-23.6-17.6-5.3-36.6-6.1-54.6-2.2-21 4.5-40.5 15.5-55.6 30.9-12.2 12.3-21.4 27.5-27 43.9-20.3-15.8-40.6-31.5-61-47.3 21.5-43 60.1-76.9 105.4-92.4z"
@@ -52,46 +59,14 @@ class Login extends Component {
                   />
                 </svg>
               </span>
-              <span class="google-button__text">Sign in with Google</span>
+              <span className="google-button__text">Sign in with Google</span>
             </button>
           </div>
         </Content>
         <FooterSection />
       </Layout>
     );
-  }
-}
+  } //end render
+} //end class Login
 
 export default Login;
-// const Login = ({ history }) => {
-//   const googleLogin = () => {
-//     var provider = new firebase.auth.GoogleAuthProvider();
-//     app.auth().signInWithRedirect(provider);
-//   };
-//   const { currentUser } = useContext(AuthContext);
-
-//   const loadPage = async () => {
-//     let res = await checkUserExist(currentUser.uid);
-//     if (res) {
-//       history.push({
-//         pathname: "/chooserole",
-//         state: { uid: currentUser.uid },
-//       });
-//     } else {
-//       history.push("/");
-//     }
-//   };
-
-//   if (currentUser) {
-//     console.log(currentUser);
-//     loadPage();
-//   }
-//   return (
-//     <div>
-//       <h1>Log in</h1>
-//       <button onClick={googleLogin}>OnClick</button>
-//     </div>
-//   );
-// };
-
-// export default withRouter(Login);

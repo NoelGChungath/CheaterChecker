@@ -18,7 +18,9 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => console.log("server is running on port 8000"));
-
+app.get("/rooms", (req, resp) => {
+  resp.send({ users });
+});
 io.on("connection", (socket) => {
   socket.on("join room", (roomID) => {
     if (users[roomID]) {
@@ -47,7 +49,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMsg", (payload) => {
-    console.log(payload);
     io.to(payload.id).emit("cheater", {
       data: payload.data,
       name: payload.name,
@@ -65,6 +66,16 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("clear", (payload) => {
+    io.emit("sendClear", {
+      room: payload.room,
+    });
+  });
+
+  socket.on("checker", (payload) => {
+    io.emit("startChecker", { roomId: payload.roomId });
+  });
+
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
@@ -72,5 +83,6 @@ io.on("connection", (socket) => {
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
     }
+    socket.broadcast.emit("user disconnected", socket.id);
   });
 });

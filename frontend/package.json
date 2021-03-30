@@ -20,8 +20,10 @@
     "react-scripts": "4.0.2",
     "simple-peer": "^9.9.3",
     "socket.io-client": "^3.1.2",
+    "ssim.js": "^3.5.0",
     "styled-components": "^5.2.1",
     "uuid": "^8.3.2",
+    "video-react": "^0.14.1",
     "web-vitals": "^1.1.0"
   },
   "scripts": {

@@ -26,15 +26,12 @@ class AuthProvider extends Component {
       if (user != null) {
         this.setState({
           currentUser: user,
-          loader: false,
           status: null,
-          photoUrl: user.photoURL,
         });
       } else {
         this.setState({
-          currentUser: user,
+          currentUser: null,
           loader: false,
-          photoUrl: user.photoURL,
         });
       }
     });
@@ -56,11 +53,14 @@ class AuthProvider extends Component {
     }
   };
 
-  getRole = async () => {
+  getRole = async (onForce) => {
     const { currentUser, status } = this.state;
     if (currentUser != null && status == null) {
       const data = await getUserRole(currentUser.uid);
-      this.setState({ status: data });
+      this.setState({ status: data, loader: false });
+    } else if (onForce == true) {
+      const data = await getUserRole(currentUser.uid);
+      this.setState({ status: data, loader: false });
     }
   };
   componentDidUpdate() {
@@ -69,7 +69,7 @@ class AuthProvider extends Component {
   }
 
   render() {
-    const { currentUser, loader, status, photoUrl } = this.state;
+    const { currentUser, loader, status } = this.state;
     if (loader) {
       return (
         <div style={this.style}>
@@ -78,7 +78,9 @@ class AuthProvider extends Component {
       );
     } else {
       return (
-        <AuthContext.Provider value={{ currentUser, status, photoUrl }}>
+        <AuthContext.Provider
+          value={{ currentUser, status, getRole: this.getRole }}
+        >
           {this.props.children}
         </AuthContext.Provider>
       );

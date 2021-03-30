@@ -1,130 +1,153 @@
+// Noel Gregory
+//2021-03-29
+//This class is made for the home route and will return the home page in jsx
+
+//imports
 import React, { Component } from "react";
 import { AuthContext } from "../utils/Auth";
-import { getLatestAssements, joinClass } from "../utils/Firestore";
+import { getLatestAssessments, joinClass } from "../utils/Firestore";
 import "./ui.css";
-import { Layout, Card, Spin, Button, Form, Input } from "antd";
+import { Layout, Card, Spin, Button, Form, Input, Modal } from "antd";
 import SiderBar from "./SideBar";
 import FooterSection from "./FooterSection";
 import HeaderSection from "./HeaderSection";
-
+import { convertMS } from "../utils/algoritims";
 const { Content } = Layout;
 
 class Home extends Component {
   static contextType = AuthContext;
+  //This function will be called when the class instance is created
+  //props:Object:holds values given by parent components
   constructor(props) {
     super(props);
-    this.state = { latest: undefined };
-  }
-  generateCode = () => {
-    const str =
-      "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
-    let genStr = "";
-    for (let i = 0; i < 5; i++) {
-      const randomIndex = Math.floor(Math.random() * str.length);
-      genStr += str[randomIndex];
-    }
-    return genStr;
-  };
+    this.state = { latest: undefined, visible: false }; //creating state variables
+  } //end constructor
 
+  //This function will get the latest assesments from the database
   getLatestAssesment = async () => {
     const { status } = this.context;
-    let latest = await getLatestAssements(status.Classes);
-    if (latest.length == 0) latest = false;
+    console.log(status);
+    console.log("fdf");
+    let latest = await getLatestAssessments(status.Classes);
+    if (latest == undefined) latest = false; // end if latest
     this.setState({ latest });
-  };
+  }; //end getLatestAssesment
 
-  renderLatest = (latestAsmt) => {
-    if (latestAsmt == false) return <h3>No Latest Assessment</h3>;
-    return latestAsmt.map((val, idx) => {
+  //This function will render the lastest assesments from the database
+  //return:JSX:returns the latest assements using jsx expressions
+  renderLatest = () => {
+    const { latest } = this.state;
+    if (latest == false) return <h3>No Latest Assessment</h3>; //end if latest
+    return latest.map((val, idx) => {
       return (
         <Card
           className="customCard"
           key={idx}
           type="inner"
-          title={val.class}
-          extra={val.data.elaspedTime}
+          title={val.assessmentObj}
+          extra={
+            val.elapsedTime > 0 ? convertMS(val.elapsedTime) : "Assessment Done"
+          }
         >
-          {val.data.assessmentObj}
+          {val.descp}
         </Card>
       );
     });
-  };
+  }; //end renderLatest
 
+  //This function handles the show button in modal
+  showModal = () => {
+    this.setState({ visible: true });
+  }; //end showModal
+
+  //This function handles the ok button in modal
+  handleOk = () => {
+    this.setState({ visible: false });
+  }; //end handleOk
+
+  //This function handles the cancel button in modal
+  handleCancel = () => {
+    this.setState({ visible: false });
+  }; //end handleCancel
+
+  //This function will add a class to the database
+  //values:Object:holds values from the form
   addToClass = async (values) => {
-    const { currentUser } = this.context;
+    const { currentUser, getRole } = this.context;
     if (values != null) {
-      const result = await joinClass(values.code, currentUser.uid);
+      const result = await joinClass(values.code, currentUser.uid); //calling joinClass to add class to firestore
       if (result != undefined) {
         alert("This Class Does Not Exist");
-      }
-    }
-  };
+      } //end if result
+    } //end if values
+    await getRole(true);
+    this.getLatestAssesment();
+    this.handleCancel();
+  }; //end addToClass
 
-  onChange = (e) => {
-    this.setState({ value: e.target.value });
-  };
+  //This function will check if the user is a student and return student info
+  //return:JSX:this returns a jsx expression if the user is a student
+  getRole = () => {
+    const { status } = this.context;
+    if (status.role == false) {
+      return (
+        <div>
+          <Button type="primary" onClick={this.showModal}>
+            Join Class
+          </Button>
+          <Modal
+            title="Join Class"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+          >
+            <Form onFinish={this.addToClass} name="dynamic_rule">
+              <Form.Item
+                name="code"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input class code",
+                  },
+                ]}
+              >
+                <Input placeholder="Please input class code" />
+              </Form.Item>
+
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Join Class
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      );
+    } //end if status.role
+  }; //end getRole
+
+  //This function is called at component mount
+  componentDidMount() {
+    this.getLatestAssesment();
+  } //end componentDidMount
 
   render() {
-    const { status } = this.context;
     const { latest } = this.state;
-    if (status != null && latest == undefined) {
-      this.getLatestAssesment();
-    }
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <SiderBar state={this.props.location.state} />
         <Layout className="site-layout">
           <HeaderSection />
-          <Content style={{ margin: "0 16px" }}>
-            <div
-              className="site-layout-background"
-              style={{ padding: 24, minHeight: 360 }}
-            >
+          <Content style={{ margin: "10px 16px" }}>
+            <Card title="Latest Assessments" extra={this.getRole()}>
               {latest == undefined ? (
                 <div className="loader">
                   <Spin size="large" tip="Loading..." />
                 </div>
               ) : (
-                this.renderLatest(latest)
+                this.renderLatest()
               )}
-              {status != null ? (
-                status.role == true ? (
-                  <div>
-                    <h3>Teacher</h3>
-                  </div>
-                ) : (
-                  <div>
-                    <h3>Student</h3>
-                    <Form onFinish={this.addToClass} name="dynamic_rule">
-                      <Form.Item
-                        name="code"
-                        label="Name"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input code",
-                          },
-                        ]}
-                      >
-                        <Input
-                          className="infoInput"
-                          placeholder="Please input code"
-                          onChange={this.onChange}
-                        />
-                      </Form.Item>
-
-                      <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                          Join Class
-                        </Button>
-                      </Form.Item>
-                    </Form>
-                  </div>
-                )
-              ) : (
-                ""
-              )}
-            </div>
+            </Card>
           </Content>
           <FooterSection />
         </Layout>
@@ -134,231 +157,3 @@ class Home extends Component {
 }
 
 export default Home;
-
-{
-  /* <Form name="dynamic_rule">
-<Form.Item
-  name="username"
-  label="Name"
-  rules={[
-    {
-      required: true,
-      message: "Please input code",
-    },
-  ]}
->
-  <Input
-    placeholder="Please input code"
-    value={this.state.someVal || ""}
-    onChange={this.onChange}
-  />
-</Form.Item>
-
-<Form.Item>
-  <Button
-    onClick={() => this.addToClass()}
-    type="primary"
-  >
-    Join Class
-  </Button>
-</Form.Item>
-</Form> */
-}
-
-// import React, { Component } from "react";
-// import { AuthContext } from "../utils/Auth";
-// import { app } from "../utils/base";
-// import { getUserRole, addClass, joinClass } from "../utils/Firestore";
-// import "antd/dist/antd.css";
-// import "./ui.css";
-// import { Layout, Menu, Breadcrumb, Input, Form, Button } from "antd";
-// import {
-//   DesktopOutlined,
-//   PieChartOutlined,
-//   FileOutlined,
-//   TeamOutlined,
-//   UserOutlined,
-// } from "@ant-design/icons";
-
-// const { Search } = Input;
-
-// const { Header, Content, Footer, Sider } = Layout;
-// const { SubMenu } = Menu;
-
-// class Home extends Component {
-//   static contextType = AuthContext;
-//   state = {
-//     collapsed: false,
-//     role: null,
-//     value: null,
-//   };
-
-//   generateCode = () => {
-//     const str =
-//       "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
-//     let genStr = "";
-//     for (let i = 0; i < 5; i++) {
-//       const randomIndex = Math.floor(Math.random() * str.length);
-//       genStr += str[randomIndex];
-//     }
-//     addClass(genStr);
-//   };
-
-//   addToClass = () => {
-//     const { currentUser } = this.context;
-//     joinClass(this.state.value, currentUser.uid);
-//   };
-
-//   getRole = async () => {
-//     const { currentUser } = this.context;
-//     const data = await getUserRole(currentUser.uid);
-//     this.setState({ role: data });
-//   };
-
-//   componentDidMount() {
-//     this.getRole();
-//   }
-
-//   onCollapse = (collapsed) => {
-//     console.log(collapsed);
-//     this.setState({ collapsed });
-//   };
-
-//   onChange = (e) => {
-//     this.setState({ value: e.target.value });
-//   };
-
-//   render() {
-//     const { collapsed, role } = this.state;
-//     console.log(role);
-//     return (
-//       <Layout style={{ minHeight: "100vh" }}>
-//         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
-//           {collapsed ? (
-//             <img className="logosmall" src="/logosmall.png"></img>
-//           ) : (
-//             <img className="logo" src="/logo.png"></img>
-//           )}
-//           <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
-//             <Menu.Item key="1" icon={<PieChartOutlined />}>
-//               Option 1
-//             </Menu.Item>
-//             <Menu.Item key="2" icon={<DesktopOutlined />}>
-//               Option 2
-//             </Menu.Item>
-//             <SubMenu key="sub1" icon={<UserOutlined />} title="User">
-//               <Menu.Item key="3">Tom</Menu.Item>
-//               <Menu.Item key="4">Bill</Menu.Item>
-//               <Menu.Item key="5">Alex</Menu.Item>
-//             </SubMenu>
-//             <SubMenu key="sub2" icon={<TeamOutlined />} title="Team">
-//               <Menu.Item key="6">Team 1</Menu.Item>
-//               <Menu.Item key="8">Team 2</Menu.Item>
-//             </SubMenu>
-//             <Menu.Item key="9" icon={<FileOutlined />}>
-//               bkh
-//             </Menu.Item>
-//           </Menu>
-//         </Sider>
-//         <Layout className="site-layout">
-//           <Header className="site-layout-background" style={{ padding: 0 }}>
-//             {" "}
-//             <Search
-//               className="search"
-//               placeholder="input search text"
-//               enterButton="Search"
-//               size="large"
-//             />
-//             <Button
-//               size="large"
-//               style={{ float: "right", margin: "10px" }}
-//               onClick={() => app.auth().signOut()}
-//               type="primary"
-//             >
-//               Sign out
-//             </Button>
-//           </Header>
-//           <Content style={{ margin: "0 16px" }}>
-//             <Breadcrumb style={{ margin: "16px 0" }}>
-//               <Breadcrumb.Item>User</Breadcrumb.Item>
-//               <Breadcrumb.Item>Bill</Breadcrumb.Item>
-//             </Breadcrumb>
-//             <div
-//               className="site-layout-background"
-//               style={{ padding: 24, minHeight: 360 }}
-//             >
-//               {role != null ? (
-//                 role == true ? (
-//                   <div>
-//                     <h3>Teacher</h3>
-//                     <button onClick={this.generateCode}>Generate code</button>
-//                   </div>
-//                 ) : (
-//                   <div>
-//                     <h3>Student</h3>
-//                     <Form name="dynamic_rule">
-//                       <Form.Item
-//                         name="username"
-//                         label="Name"
-//                         rules={[
-//                           {
-//                             required: true,
-//                             message: "Please input code",
-//                           },
-//                         ]}
-//                       >
-//                         <Input
-//                           placeholder="Please input code"
-//                           value={this.state.someVal || ""}
-//                           onChange={this.onChange}
-//                         />
-//                       </Form.Item>
-
-//                       <Form.Item>
-//                         <Button
-//                           onClick={() => this.addToClass()}
-//                           type="primary"
-//                         >
-//                           Join Class
-//                         </Button>
-//                       </Form.Item>
-//                     </Form>
-//                   </div>
-//                 )
-//               ) : (
-//                 ""
-//               )}
-//             </div>
-//           </Content>
-//           <Footer style={{ textAlign: "center" }}>
-//             Ant Design ©2018 Created by Ant UED
-//           </Footer>
-//         </Layout>
-//       </Layout>
-//     );
-//   }
-// }
-
-// export default Home;
-// const Home = () => {
-//   const { currentUser } = useContext(AuthContext);
-//   const [role, setRole] = useState(null);
-
-//   if (!currentUser) {
-//     return <Redirect to="/login" />;
-//   }
-//   const getData = () => {
-//     setRole(getUserRole(currentUser.uid));
-//   };
-//   getData();
-//   console.log(role);
-//   return (
-//     <>
-//       <h1>Home</h1>
-//       {currentUser.email}
-//       <button onClick={() => app.auth().signOut()}>Sign out</button>
-//     </>
-//   );
-// };
-
-// export default Home;

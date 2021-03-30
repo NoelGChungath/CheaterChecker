@@ -4,8 +4,7 @@ import { Layout, Menu } from "antd";
 import {
   DesktopOutlined,
   PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 const { Sider } = Layout;
@@ -36,8 +35,8 @@ class SideBar extends Component {
         ) : (
           <img className="logo" src="/logo.png"></img>
         )}
-        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
+        <Menu theme="dark" mode="inline">
+          <Menu.Item icon={<PieChartOutlined />}>
             <Link
               to={{
                 pathname: "/",
@@ -47,7 +46,7 @@ class SideBar extends Component {
               Home
             </Link>
           </Menu.Item>
-          <Menu.Item key="2" icon={<DesktopOutlined />}>
+          <Menu.Item icon={<DesktopOutlined />}>
             <Link
               to={{
                 pathname: "/classes",
@@ -57,7 +56,7 @@ class SideBar extends Component {
               Classes
             </Link>
           </Menu.Item>
-          <Menu.Item key="3" icon={<DesktopOutlined />}>
+          <Menu.Item icon={<SettingOutlined />}>
             <Link
               to={{
                 pathname: "/setting",

@@ -3,20 +3,26 @@ import io from "socket.io-client";
 import "./room.css";
 import Sketch from "react-p5";
 
+console.log("fdfdsdsdddddddddddfd");
 const Whiteboard = (props) => {
   const [color, setColor] = useState("#000000");
   const [weight, setWeight] = useState(3);
   const socketRef = useRef();
-  const roomID = props.state.room;
-  const role = props.state.role;
+  const { roomID, role } = props.location.state;
   const endPoint = {
-    local: "http://192.168.0.35:8000/",
+    local: "http://localhost:8000/",
     prod: "https://isugapi.herokuapp.com/",
   };
   let p = null;
 
   const setup = (p5, parent) => {
     socketRef.current = io.connect(endPoint.local);
+    socketRef.current.on("sendClear", (payload) => {
+      console.log(payload);
+      if (payload.room == roomID) {
+        p.background(240);
+      } //end if payload.room
+    });
     socketRef.current.on("sendCoord", (coord) => {
       if (roomID == coord.room) {
         const { x, y, px, py } = coord.data;
@@ -48,7 +54,7 @@ const Whiteboard = (props) => {
         window.innerHeight - window.innerHeight / 18
       )
       .parent(parent);
-    if (role == "true") {
+    if (role == true) {
       canvas.addClass("drawTeacherCanvas");
     } else {
       canvas.addClass("drawStudentCanvas");
@@ -58,6 +64,9 @@ const Whiteboard = (props) => {
   };
   const clear = () => {
     p.background(240);
+    socketRef.current.emit("clear", {
+      room: roomID,
+    });
   };
 
   function mouseDragged(p5) {
@@ -84,7 +93,7 @@ const Whiteboard = (props) => {
 
   return (
     <div>
-      {role == "true" ? (
+      {role == true ? (
         <div>
           {" "}
           <div className="optionToDraw">

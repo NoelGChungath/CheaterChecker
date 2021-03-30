@@ -1,3 +1,8 @@
+//Noel Gregory
+//2021-03-29
+//This class will create a extra info component
+
+//imports
 import React, { Component } from "react";
 import "./ui.css";
 import { AuthContext } from "../utils/Auth.js";
@@ -11,13 +16,17 @@ const { Step } = Steps;
 
 class ExtraInfo extends Component {
   static contextType = AuthContext;
+  //This function will add extra data to user
+  //values:Object:contains the values from form
   getFormData = async (value) => {
     console.log(value);
     const { currentUser } = this.context;
-    await addInfo(value, currentUser.uid);
+    await addInfo(value, currentUser.uid); //add user info
     this.props.history.push("/");
-  };
+  }; //end getFormData
 
+  //This fucntion will render the extra info component
+  //return:JSX:will return a extra info page in jsx
   render() {
     return (
       <Layout style={{ minHeight: "100vh" }}>
@@ -52,7 +61,7 @@ class ExtraInfo extends Component {
               </Form.Item>
               <Form.Item className="info">
                 <Button htmlType="submit" type="primary">
-                  Submit
+                  Add
                 </Button>
                 <Button
                   style={{ float: "center", margin: "10px" }}
@@ -68,7 +77,7 @@ class ExtraInfo extends Component {
         <FooterSection />
       </Layout>
     );
-  }
-}
+  } //end render
+} //end class ExtraInfo
 
 export default ExtraInfo;

@@ -1,5 +1,6 @@
 import { db } from "./base";
 import firebase from "firebase/app";
+import { quickSort } from "./algoritims";
 
 const checkUserExist = async (uid) => {
   const docRef = db.collection("users").doc(uid);
@@ -68,9 +69,14 @@ const getAllClasses = async (uid, studentOrTeacher) => {
     query = docRef.where("students", "array-contains", uid);
   }
   const data = await query.get();
-  const classes = data.docs.map((doc) => {
-    return doc.data();
-  });
+  const classes = [];
+  for (let i = 0; i < data.docs.length; i++) {
+    let tempData = data.docs[i].data();
+    const id = tempData.owner;
+    const name = await getNameById(id);
+    tempData.owner = name;
+    classes.push(tempData);
+  }
   return classes;
 };
 const addClassToUser = async (code, uid) => {
@@ -85,83 +91,117 @@ const getUserRole = async (uid) => {
   const data = doc.data();
   return data;
 };
-function convertMS(ms) {
-  var d, h, m, s;
-  s = Math.floor(ms / 1000);
-  m = Math.floor(s / 60);
-  s = s % 60;
-  h = Math.floor(m / 60);
-  m = m % 60;
-  d = Math.floor(h / 24);
-  h = h % 24;
-  let date = "";
-  let counter = 0;
-  if (d != 0) {
-    date += d + " days, ";
-    counter++;
-  }
-  if (h != 0) {
-    date += h + " hours, ";
-    counter++;
-  }
-  //if (counter != 2) {
-  if (m != 0) {
-    date += m + " minutes, ";
-  }
-  if (s != 0) {
-    date += s + " seconds ";
-  }
-  //  }
 
-  return date;
-}
-const getLatestAssements = async (classes) => {
-  const docRef = db.collection("assessment");
-  const query = docRef.where("classCode", "in", classes);
-  const data = await query.get();
-  const currentDate = new Date();
-  let filteredData = [];
-  data.docs.map((doc) => {
-    const tempData = doc.data();
-    tempData.assessments.map((val) => {
-      filteredData.push({ data: val, class: tempData.className });
-      var storedDate = new Date(val.date);
-      var elapsedTime = currentDate.getTime() - storedDate.getTime();
-      val.elaspedTime = convertMS(elapsedTime);
+const updateClass = async (classCode, className) => {
+  try {
+    const docRef = db.collection("classes").doc(classCode);
+    await docRef.update({
+      className,
     });
+  } catch (e) {}
+};
+const updateUserDetails = async (uid, nickname, status) => {
+  const docRef = db.collection("users").doc(uid);
+  await docRef.update({
+    nickname,
+    status,
   });
-  return filteredData;
+};
+const getLatestAssessments = async (classes) => {
+  if (classes != undefined) {
+    const docRef = db.collection("assessment");
+    const query = docRef.where("classCode", "in", classes);
+    const data = await query.get();
+    const currentDate = new Date();
+    let filteredData = [];
+    data.docs.map((doc) => {
+      const tempData = doc.data();
+      tempData.assessments.map((val) => {
+        filteredData.push(val);
+        var storedDate = new Date(val.date);
+        var elapsedTime = storedDate.getTime() - currentDate.getTime();
+        val.elapsedTime = elapsedTime;
+        return val;
+      });
+    });
+    console.log(filteredData.lenght + " dsddds");
+    if (filteredData.lenght > 1) {
+      filteredData = quickSort(filteredData, 0, filteredData.length - 1);
+    }
+    return filteredData;
+  } else {
+    return [];
+  }
 };
 
-const addAssesment = async (classCode, assessmentObj, roomId) => {
-  const docRef = db.collection("assessment").doc(classCode);
-  const date = new Date().toString();
-  await docRef.update({
-    classCode,
-    assessments: firebase.firestore.FieldValue.arrayUnion({
-      assessmentObj,
-      roomId,
-      date,
-    }),
-  });
+const getNameById = async (uid) => {
+  try {
+    const docRef = db.collection("users").doc(uid);
+    const doc = await docRef.get();
+    const username = doc.data().nickname;
+    return username;
+  } catch (e) {
+    return false;
+  }
 };
-const getAssesment = async (classCode) => {
+
+const addAssessment = async (classCode, assessmentObj, roomId, date, descp) => {
+  try {
+    const docRef = db.collection("assessment").doc(classCode);
+    await docRef.update({
+      classCode,
+      assessments: firebase.firestore.FieldValue.arrayUnion({
+        assessmentObj,
+        descp,
+        roomId,
+        date: date.toString(),
+        socketId: null,
+      }),
+    });
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+const getAssessment = async (classCode) => {
   const docRef = db.collection("assessment").doc(classCode);
   const doc = await docRef.get();
   return doc.data();
 };
 
-const addTeacherSocket = async (sockedId, classCode) => {
+const addTeacherSocket = async (sockedId, classCode, roomdId) => {
   const docRef = db.collection("assessment").doc(classCode);
+  const doc = await docRef.get();
+  let data = doc.data();
+  let filteredArr = data.assessments.map((val) => {
+    if (val.roomId == roomdId) {
+      val["socketId"] = sockedId;
+    }
+    return val;
+  });
+  data.assessments = filteredArr;
+  docRef.set(data);
+};
 
-  await docRef.update({ sockedId });
+const deleteAssessment = async (classCode, roomId) => {
+  const docRef = db.collection("assessment").doc(classCode);
+  const doc = await docRef.get();
+  let data = doc.data();
+  let filteredArr = data.assessments.filter((val) => val.roomId != roomId);
+  data.assessments = filteredArr;
+  docRef.set(data);
 };
 
 export {
-  getLatestAssements,
+  getNameById,
+  deleteAssessment,
+  updateClass,
+  updateUserDetails,
+  getLatestAssessments,
   addTeacherSocket,
-  getAssesment,
-  addAssesment,
+  getAssessment,
+  addAssessment,
   checkUserExist,
   addUser,
   getUserRole,
