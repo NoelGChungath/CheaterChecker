@@ -1,8 +1,14 @@
+//Noel Gregory
+//2021-03-30
+
+//imports
 import React from "react";
 import { Layout, Menu } from "antd";
 
 const { Header } = Layout;
 
+//This function will render the navbar component
+//return:JSX:contains jsx expression of navbar component
 const Navbar = () => {
   return (
     <Header>
@@ -10,6 +16,6 @@ const Navbar = () => {
       <Menu theme="dark" mode="horizontal"></Menu>
     </Header>
   );
-};
+}; //end Navbar
 
 export default React.memo(Navbar);

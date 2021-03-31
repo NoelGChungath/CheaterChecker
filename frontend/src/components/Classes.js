@@ -104,9 +104,10 @@ class Classes extends Component {
   //This function will edit class detials
   //code:String:class code
   //value:Object:contains class details fromt he form
-  editClass = (code, value) => {
-    updateClass(code, value.className);
-    this.handleCancelClass();
+  editClass = async (code, value, idx) => {
+    this.handleCancel(idx);
+    await updateClass(code, value.className);
+    this.getClass();
   }; //editClass
 
   //This function will render all the classes
@@ -145,7 +146,9 @@ class Classes extends Component {
                 onCancel={() => this.handleCancel(idx)}
               >
                 <Form
-                  onFinish={(value) => this.editClass(val.classCode, value)}
+                  onFinish={(value) =>
+                    this.editClass(val.classCode, value, idx)
+                  }
                   layout="inline"
                   name="dynamic_rule"
                 >
@@ -173,7 +176,7 @@ class Classes extends Component {
                       htmlType="submit"
                       type="primary"
                     >
-                      Add Class
+                      Update Class
                     </Button>
                   </Form.Item>
                 </Form>

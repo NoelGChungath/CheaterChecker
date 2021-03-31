@@ -1,9 +1,15 @@
+//Noel Gregory
+//2021-03-30
+//This file will create a whiteboard component
+
+//imports
 import React, { useRef, useState } from "react";
 import io from "socket.io-client";
 import "./room.css";
 import Sketch from "react-p5";
 
-console.log("fdfdsdsdddddddddddfd");
+//This function will render the whiteboard component
+//props:Object:contains props form parent component
 const Whiteboard = (props) => {
   const [color, setColor] = useState("#000000");
   const [weight, setWeight] = useState(3);
@@ -13,18 +19,21 @@ const Whiteboard = (props) => {
     local: "http://localhost:8000/",
     prod: "https://isugapi.herokuapp.com/",
   };
-  let p = null;
+  let p = null; //contains p5 instance
 
+  //This function will setup the canvas and socket.on
+  //p5:Object:contains in p5 Object
+  //parent:Object:contains p5 parent
   const setup = (p5, parent) => {
-    socketRef.current = io.connect(endPoint.local);
+    socketRef.current = io.connect(endPoint.prod);
     socketRef.current.on("sendClear", (payload) => {
-      console.log(payload);
       if (payload.room == roomID) {
         p.background(240);
       } //end if payload.room
     });
     socketRef.current.on("sendCoord", (coord) => {
       if (roomID == coord.room) {
+        //calculations
         const { x, y, px, py } = coord.data;
         const { c, w, widthSize, heighthSize } = coord.settings;
         let x1 = p5.map(x, 0, widthSize, 0, window.innerWidth);
@@ -43,10 +52,11 @@ const Whiteboard = (props) => {
           0,
           window.innerHeight - window.innerHeight / 18
         );
+        //draw
         p5.stroke(c);
         p5.strokeWeight(w);
         p5.line(x1, y1, x2, y2);
-      }
+      } //end if roomID
     });
     const canvas = p5
       .createCanvas(
@@ -58,29 +68,38 @@ const Whiteboard = (props) => {
       canvas.addClass("drawTeacherCanvas");
     } else {
       canvas.addClass("drawStudentCanvas");
-    }
+    } //end if role
     p = p5;
     p5.background(240);
-  };
+  }; //end setup
+
+  //This fucntion will clear the canvas
   const clear = () => {
     p.background(240);
+    //emit
     socketRef.current.emit("clear", {
       room: roomID,
     });
-  };
+  }; //end clear
 
+  //This function will draw a line where the mouse position is
+  //p5:Object:p5 object
   function mouseDragged(p5) {
     p5.stroke(color);
     p5.strokeWeight(weight);
     connection(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
     p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
     p = p5;
-  }
+  } //end mouseDragged
 
+  //This function will send  mouse position to students
+  //x:Integer:x position
+  //y:Integer:y position
+  //px:Integer:previous x position
+  //py:Integer:previous y position
   const connection = (x, y, px, py) => {
     socketRef.current.emit("coord", {
       data: { x, y, px, py },
-
       settings: {
         c: color,
         w: weight,
@@ -89,7 +108,7 @@ const Whiteboard = (props) => {
       },
       room: roomID,
     });
-  };
+  }; //end connection
 
   return (
     <div>
@@ -119,6 +138,6 @@ const Whiteboard = (props) => {
       )}
     </div>
   );
-};
+}; //end Whiteboard
 
 export default Whiteboard;

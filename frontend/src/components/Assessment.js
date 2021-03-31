@@ -1,3 +1,8 @@
+//Noel Gregory
+//2021-03-30
+//This class will create assessments component
+
+//imports
 import React, { Component } from "react";
 import "./ui.css";
 import FooterSection from "./FooterSection";
@@ -26,6 +31,9 @@ const { Content } = Layout;
 
 class Assessment extends Component {
   static contextType = AuthContext;
+
+  //This function will create the global variables
+  //props:Object:contains parent props
   constructor(props) {
     super(props);
     this.state = {
@@ -33,19 +41,27 @@ class Assessment extends Component {
       assessments: undefined,
       visible: false,
     };
-  }
+  } //end constructor
+
+  //This function will get all the assessments
   getAllAssessment = async () => {
     const { classInfo } = this.state;
     const classCode = classInfo.classCode;
     let data = await getAssessment(classCode);
     if (data.assessments.length == 0) {
       data = false;
-    }
+    } //end if data.assessments.length
     this.setState({ assessments: data });
-  };
+  }; //end getAllAssessment
+
+  //This function will add assessment on button click
+  //value:Object:contains the value form form
   addAssessmentOnClick = (value) => {
     this.createAssessment(value);
-  };
+  }; //end addAssessmentOnClick
+
+  //This function will create an assessment
+  //values:Object:contains value from form
   createAssessment = async (value) => {
     const date = value.date._d;
     const descp = value.descp;
@@ -67,35 +83,43 @@ class Assessment extends Component {
         assessments = { assessments: [{ assessmentObj, descp, roomId }] };
       } else {
         assessments.assessments.push({ assessmentObj, descp, roomId });
-      }
+      } //end if assessments
       this.handleOk();
-    }
+    } //end if result
     this.setState({ assessments });
   };
+
+  //This function handles the show button in modal
   showModal = () => {
     this.setState({ visible: true });
-  };
+  }; //end showModal
 
+  //This function handles the ok button in modal
   handleOk = () => {
     this.setState({ visible: false });
-  };
+  }; //end handleOk
 
+  //This function handles the cancel button in modal
   handleCancel = () => {
     this.setState({ visible: false });
-  };
+  }; //end handleCancel
 
+  //This function will delete the specfic assessment
+  //roomId:String:room code
   delete = async (roomId) => {
     const { classInfo } = this.state;
     const classCode = classInfo.classCode;
     await deleteAssessment(classCode, roomId);
     this.getAllAssessment();
-  };
+  }; //end delete
 
+  //This function will render the assessments
+  //return:Array:contains the jsx expression of each assessment
   renderAssessments = () => {
     const { assessments, classInfo } = this.state;
     const { status } = this.context;
     const classCode = classInfo.classCode;
-    if (assessments == false) return <h2>No Assessments</h2>;
+    if (assessments == false) return <h2>No Assessments</h2>; //end if assessments
     return assessments.assessments.map((val, idx) => {
       const { assessmentObj, roomId, descp, socketId } = val;
       return (
@@ -105,15 +129,21 @@ class Assessment extends Component {
           type="inner"
           title={assessmentObj}
           extra={
-            socketId != undefined || status.role == true ? (
+            socketId != null || status.role == true ? (
               <div>
-                <Button
-                  type="primary"
-                  style={{ marginRight: "10px" }}
-                  onClick={() => this.delete(roomId)}
-                >
-                  Delete Assessment
-                </Button>
+                {
+                  status.role == true ? (
+                    <Button
+                      type="primary"
+                      style={{ marginRight: "10px" }}
+                      onClick={() => this.delete(roomId)}
+                    >
+                      Delete Assessment
+                    </Button>
+                  ) : (
+                    ""
+                  ) //end if status.role
+                }
                 <Link
                   to={{
                     pathname: "/room",
@@ -131,15 +161,16 @@ class Assessment extends Component {
               </div>
             ) : (
               <Link disabled>{socketId}Assessment Not Open</Link>
-            )
+            ) //end if socketId and socket.role
           }
         >
           {descp}
         </Card>
       );
-    });
-  };
-
+    }); //end mapping assessments
+  }; //end renderAssessments
+  //This function will render jsx depending on role
+  //return:JSX:contains jsx expression of teacher role parts
   getRole = () => {
     const { status } = this.context;
     if (status != null) {
@@ -216,12 +247,17 @@ class Assessment extends Component {
         );
       } else {
         return <div>Student</div>;
-      }
-    }
-  };
+      } //end if status.role
+    } //end if status
+  }; //end getRole
+
+  //This function will get all assements on component mount
   componentDidMount() {
     this.getAllAssessment();
-  }
+  } //end componentDidMount
+
+  //This function will render the assessment component
+  //return:JSX:contians the jsx ecpression of the assessment componenet
   render() {
     const { assessments } = this.state;
     return (
@@ -244,7 +280,7 @@ class Assessment extends Component {
         </Layout>
       </Layout>
     );
-  }
-}
+  } //end render
+} //end class Assessment
 
 export default Assessment;

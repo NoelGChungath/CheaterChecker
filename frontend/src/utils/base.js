@@ -1,16 +1,22 @@
+//Noel Gregory
+//2021-03-30
+//This file contains firebase initialization
+
+//imports
 import firebase from "firebase/app";
 import "firebase/firestore";
 
+//initing the firebase
 const app = firebase.initializeApp({
-  apiKey: "AIzaSyDGQEeY4WAxVnkEc8g8Yvx-OhveqaDseK8",
-  authDomain: "cheaterchecker-202ee.firebaseapp.com",
-  projectId: "cheaterchecker-202ee",
-  storageBucket: "cheaterchecker-202ee.appspot.com",
-  messagingSenderId: "910367486585",
-  appId: "1:910367486585:web:1d47256801e71b1a535aa8",
-  measurementId: "G-XSK9QN5PJM",
+  apiKey: "AIzaSyDiUddtS0KDs9okreiSVbCqcMQF2OxN38c",
+  authDomain: "cheater-a4c1b.firebaseapp.com",
+  projectId: "cheater-a4c1b",
+  storageBucket: "cheater-a4c1b.appspot.com",
+  messagingSenderId: "684918680862",
+  appId: "1:684918680862:web:862ae1f24dc62ff5632d0f",
+  measurementId: "G-DT9Y6X17CQ",
 });
 
-const db = firebase.firestore();
+const db = firebase.firestore(); //creating firestore instance
 
 export { app, db };

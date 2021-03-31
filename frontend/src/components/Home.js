@@ -24,10 +24,17 @@ class Home extends Component {
   } //end constructor
 
   //This function will get the latest assesments from the database
-  getLatestAssesment = async () => {
+  //code:String:class code
+  getLatestAssesment = async (code) => {
     const { status } = this.context;
-    console.log(status);
-    console.log("fdf");
+    if (code != undefined) {
+      if (status["Classes"] == undefined) {
+        status["Classes"] = [];
+      }
+      status["Classes"].push(code);
+    } //end code
+    console.log(status.Classes);
+
     let latest = await getLatestAssessments(status.Classes);
     if (latest == undefined) latest = false; // end if latest
     this.setState({ latest });
@@ -80,8 +87,8 @@ class Home extends Component {
         alert("This Class Does Not Exist");
       } //end if result
     } //end if values
-    await getRole(true);
-    this.getLatestAssesment();
+    getRole(true);
+    this.getLatestAssesment(values.code);
     this.handleCancel();
   }; //end addToClass
 
@@ -131,6 +138,8 @@ class Home extends Component {
     this.getLatestAssesment();
   } //end componentDidMount
 
+  //This function will render the home component
+  //return:JSX:contains jsx expression of home component
   render() {
     const { latest } = this.state;
     return (
@@ -153,7 +162,7 @@ class Home extends Component {
         </Layout>
       </Layout>
     );
-  }
-}
+  } //end render
+} //end class Home
 
 export default Home;
