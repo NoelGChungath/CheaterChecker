@@ -1,3 +1,6 @@
+//Noel Gregory
+//2021-03-31
+//This class contains all the routes for the react website
 import React, { Component } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
@@ -14,8 +17,10 @@ import Assessment from "./Assessment";
 import Room from "./room";
 import Whiteboard from "./whiteboard";
 import Settings from "./Settings";
+
 class App extends Component {
-  state = {};
+  //This function will render the app component and all the routes
+  //return:String:contaisn the app jsx expression
   render() {
     return (
       <Router>
@@ -34,6 +39,6 @@ class App extends Component {
       </Router>
     );
   }
-}
+} //end class App
 
 export default App;

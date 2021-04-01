@@ -6,13 +6,13 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import { addTeacherSocket } from "../utils/Firestore";
-import { pearson } from "../utils/algoritims";
+import { pearson } from "../utils/algorithm";
 import { Modal, Button, Image } from "antd";
 import "./room.css";
 
 //This function will create the video component
 //props:Object:contains the parent component values
-//return:JSX:contains the jsx expression of video component
+//return:String:contains the jsx expression of video component
 const Video = (props) => {
   const ref = useRef();
   const [visible, setVisible] = useState(false);
@@ -131,7 +131,7 @@ let vid = {
 
 //This function will create a Room component
 //props:Object:contains the parent component values
-//return:JSX:contains the room component jsx expression
+//return:String:contains the room component jsx expression
 const Room = (props) => {
   const [peers, setPeers] = useState([]);
   const [visible, setVisible] = useState();
@@ -150,18 +150,19 @@ const Room = (props) => {
   //This function will create connection to socket and intialize sceenshare
   useEffect(() => {
     socketRef.current = io.connect(endPoint.prod); //connecting server
+    //start screenshare
     navigator.mediaDevices
       .getDisplayMedia({
         video: {
           width: 1280,
           height: 720,
           frameRate: {
-            ideal: 10,
-            max: 15,
+            ideal: 2,
+            max: 3,
           },
         },
         cursor: true,
-        mimeType: "video/webm; codecs=vp9",
+        mimeType: "video/webm; codecs=vp9", //set vp9 codecs
       })
       .then((stream) => {
         userVideo.current.srcObject = stream;
@@ -173,20 +174,20 @@ const Room = (props) => {
               if (checker >= 1) {
                 const canvas = document.getElementById("canvas");
                 const ctx = canvas.getContext("2d");
-                ctx.drawImage(userVideo.current, 0, 0, 16, 12);
+                ctx.drawImage(userVideo.current, 0, 0, 16, 12); // draw image
                 const imageData = ctx.getImageData(
                   0,
                   0,
                   canvas.width,
                   canvas.height
                 );
-                let data = imageData.data;
+                let data = imageData.data; //get image from canvas
 
                 if (checker == 1 || checker == 2) {
                   currentImage = imageData.data;
                   checker++;
                 } //end if checker
-                const result = pearson(data, currentImage);
+                const result = pearson(data, currentImage); // get similarity rate
                 const date = new Date().getTime();
                 socketRef.current.emit("sendMsg", {
                   data: result,
@@ -194,7 +195,7 @@ const Room = (props) => {
                   myId: socketRef.current.id,
                   time: date,
                   name: name,
-                });
+                }); // send data to teacher
               } //end if checker
             } catch (e) {} //end try
           }, 1000);
@@ -203,7 +204,7 @@ const Room = (props) => {
         socketRef.current.emit("join room", roomID);
 
         if (role == true) {
-          addSocket(socketRef.current.id);
+          addSocket(socketRef.current.id); //add teacher socket to database
         } //end if role
 
         //This function will get all users from server
@@ -223,7 +224,7 @@ const Room = (props) => {
             } //end if socketId
           });
           setPeers(peers);
-        }); //end function
+        }); //end forEach users
 
         //This function will send the cheating rate for the students
         //payload:Object:contains the payload from server,with user info
@@ -267,7 +268,7 @@ const Room = (props) => {
             peer,
           });
           counter++;
-          calcPlayerSize();
+          calcPlayerSize(); //calculate video size
           setPeers((users) => [...users, { peer, id: payload.callerID }]);
         }); //end function
 
@@ -306,7 +307,7 @@ const Room = (props) => {
   //This function will run on unmount of component and disconnect user from server
   useEffect(() => {
     return () => {
-      socketRef.current.close();
+      socketRef.current.close(); //close socket connection
     };
   }, []); //end useEffect
 
@@ -341,7 +342,6 @@ const Room = (props) => {
   //stream:Object:contains the stream object froms creensahre
   //return:Object:contains the peer object
   function addPeer(incomingSignal, callerID, stream) {
-    console.log(stream);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -351,7 +351,6 @@ const Room = (props) => {
     //This function will be called on peer signal
     //signal:Object:contains peer signal object
     peer.on("signal", (signal) => {
-      console.log(signal);
       socketRef.current.emit("returning signal", { signal, callerID });
     }); //end function
 

@@ -46,8 +46,10 @@ class Assessment extends Component {
   //This function will get all the assessments
   getAllAssessment = async () => {
     const { classInfo } = this.state;
+    const { getRole } = this.context;
+    await getRole(true); // get user role
     const classCode = classInfo.classCode;
-    let data = await getAssessment(classCode);
+    let data = await getAssessment(classCode); //get all assessments in database
     if (data.assessments.length == 0) {
       data = false;
     } //end if data.assessments.length
@@ -75,7 +77,7 @@ class Assessment extends Component {
       roomId,
       date,
       descp
-    );
+    ); //create new assessment
     if (result == false) {
       alert("Error, please try again later");
     } else {
@@ -104,12 +106,12 @@ class Assessment extends Component {
     this.setState({ visible: false });
   }; //end handleCancel
 
-  //This function will delete the specfic assessment
+  //This function will delete the specific assessment
   //roomId:String:room code
   delete = async (roomId) => {
     const { classInfo } = this.state;
     const classCode = classInfo.classCode;
-    await deleteAssessment(classCode, roomId);
+    await deleteAssessment(classCode, roomId); //delete assessment
     this.getAllAssessment();
   }; //end delete
 
@@ -170,7 +172,7 @@ class Assessment extends Component {
     }); //end mapping assessments
   }; //end renderAssessments
   //This function will render jsx depending on role
-  //return:JSX:contains jsx expression of teacher role parts
+  //return:String:contains jsx expression of teacher role parts
   getRole = () => {
     const { status } = this.context;
     if (status != null) {
@@ -251,13 +253,13 @@ class Assessment extends Component {
     } //end if status
   }; //end getRole
 
-  //This function will get all assements on component mount
+  //This function will get all assessments on component mount
   componentDidMount() {
     this.getAllAssessment();
   } //end componentDidMount
 
   //This function will render the assessment component
-  //return:JSX:contians the jsx ecpression of the assessment componenet
+  //return:String:contians the jsx ecpression of the assessment componenet
   render() {
     const { assessments } = this.state;
     return (

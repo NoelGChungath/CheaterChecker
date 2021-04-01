@@ -53,7 +53,7 @@ class Settings extends Component {
   } //end componentDidMount
 
   //This function will render the setting component
-  //return:JSX:contains the jsx expression fo settings component
+  //return:String:contains the jsx expression fo settings component
   render() {
     const { photoUrl, userDetail } = this.state;
     return (

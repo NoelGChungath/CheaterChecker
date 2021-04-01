@@ -5,7 +5,7 @@
 //imports
 import { db } from "./base";
 import firebase from "firebase/app";
-import { quickSort } from "./algoritims";
+import { quickSort } from "./algorithm";
 
 //This function will check if a user exist in firestore
 //uid:String:user id
@@ -172,10 +172,11 @@ export const getLatestAssessments = async (classes) => {
         return val;
       }); //end mapping assessments
     }); //end mapping docs
-    console.log(filteredData);
-    if (filteredData.lenght > 1) {
+
+    if (filteredData.length > 1) {
       filteredData = quickSort(filteredData, 0, filteredData.length - 1);
     } //end if filteredData.lenght
+
     return filteredData;
   } else {
     return [];
@@ -196,7 +197,7 @@ export const getNameById = async (uid) => {
   } //end try catch
 }; //end getNameById
 
-//This function will ass assessments
+//This function will add assessments
 //classCode:String:class code
 //assessmentObj:String:contains assessment name
 //roomId:String:room id

@@ -8,7 +8,7 @@ import { Layout, Menu } from "antd";
 const { Header } = Layout;
 
 //This function will render the navbar component
-//return:JSX:contains jsx expression of navbar component
+//return:String:contains jsx expression of navbar component
 const Navbar = () => {
   return (
     <Header>

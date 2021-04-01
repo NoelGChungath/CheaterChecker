@@ -34,7 +34,7 @@ class SideBar extends Component {
   }; //end onCollapse
 
   //This function will render the sidebar component
-  //return:JSX:contains jsx expression of sidebar
+  //return:String:contains jsx expression of sidebar
   render() {
     const { collapsed } = this.state;
     return (

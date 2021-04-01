@@ -70,8 +70,6 @@ class AuthProvider extends Component {
       this.setState({ status: data, loader: false });
     } else if (onForce == true) {
       const data = await getUserRole(currentUser.uid);
-      console.log("////////");
-      console.log(data);
       this.setState({ status: data, loader: false });
     } //end if currentUser and status
   }; //end getRole
@@ -83,7 +81,7 @@ class AuthProvider extends Component {
   } //end componentDidUpdate
 
   //This function will render the auth component
-  //return:JSX:contains the auth render component
+  //return:String:contains the auth render component
   render() {
     const { currentUser, loader, status } = this.state;
     if (loader) {

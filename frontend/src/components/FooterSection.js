@@ -10,7 +10,7 @@ import { Layout } from "antd";
 const { Footer } = Layout;
 
 //This function will return a footer section component
-//return:JSX:will return the footer section's jsx expression
+//return:String:will return the footer section's jsx expression
 const FooterSection = () => {
   return (
     <Footer style={{ textAlign: "center" }}>

@@ -19,14 +19,14 @@ class SelectRole extends Component {
   selectRole = async (val) => {
     const { currentUser } = this.context;
     if (val == "teacher") {
-      await addUser(currentUser.uid, true);
+      await addUser(currentUser.uid, true); // add a role to user
     } else {
       await addUser(currentUser.uid, false);
     } //end if val
     this.props.history.push("/extrainfo"); //push to history
   }; //end selectRole
   //This function will render the select role page
-  //return:JSX:returns the select role page
+  //return:String:returns the select role page
   render() {
     return (
       <Layout style={{ minHeight: "100vh" }}>

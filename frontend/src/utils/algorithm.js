@@ -2,7 +2,7 @@
 //2021-03-30
 //This file has function for similarity of images and sorting
 
-//this function wlll check the similarty between two images
+//This function will check the similarity between two images
 //a:Array:image array of first image
 //b:Array:image array of second image
 //return:Float:contains similarity rate
@@ -19,7 +19,7 @@ function kumarHassebrook(a, b) {
   return p / (p2 + q2 - p);
 } //end kumarHassebrook
 
-//This function will calcualte the mean of an array
+//This function will calculate the mean of an array
 //a:Array:this contains the image array
 //return:Flaot:contains the mean value of array
 function mean(a) {
@@ -27,13 +27,13 @@ function mean(a) {
   return total / a.length;
 } //end mean
 
-//This fucntion will normilize the images and get similarity
+//This function will normalize the images and get similarity
 //a:Array:image array of first image
 //b:Array:image array of second image
 //return:Float:contains similarity rate
 export function pearson(a, b) {
-  var avgA = mean(a);
-  var avgB = mean(b);
+  var avgA = mean(a); //mean of array a
+  var avgB = mean(b); //mean of array b
 
   var newA = new Array(a.length);
   var newB = new Array(b.length);
@@ -45,7 +45,7 @@ export function pearson(a, b) {
   return kumarHassebrook(newA, newB);
 }
 
-//this function generates a random code
+//This function generates a random code
 //returnLString:random code
 export const generateCode = () => {
   const str = "qwertyuioplkjhgfdsazxcvbnm1234567890QAZXSWEDCVFRTGBNHYUJMKILOP";
@@ -87,7 +87,7 @@ export const convertMS = (ms) => {
   return date;
 }; //end convertMS
 
-//this function will partition the array
+//This function will partition the array
 //arr:Array:contains the array
 //start:Intger:start index
 //end:Integer:contains end index
@@ -115,7 +115,7 @@ const partition = (arr, start, end) => {
 //end:Integer:contains end index
 //return:Array:sorted array
 export const quickSort = (arr, start, end) => {
-  if (start >= end) return;
+  if (start >= end) return; //end start
 
   let index = partition(arr, start, end);
   quickSort(arr, start, index - 1);

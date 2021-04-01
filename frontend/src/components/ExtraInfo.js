@@ -19,14 +19,13 @@ class ExtraInfo extends Component {
   //This function will add extra data to user
   //values:Object:contains the values from form
   getFormData = async (value) => {
-    console.log(value);
     const { currentUser } = this.context;
     await addInfo(value, currentUser.uid); //add user info
     this.props.history.push("/");
   }; //end getFormData
 
   //This fucntion will render the extra info component
-  //return:JSX:will return a extra info page in jsx
+  //return:String:will return a extra info page in jsx
   render() {
     return (
       <Layout style={{ minHeight: "100vh" }}>

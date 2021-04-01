@@ -26,11 +26,15 @@ const Whiteboard = (props) => {
   //parent:Object:contains p5 parent
   const setup = (p5, parent) => {
     socketRef.current = io.connect(endPoint.prod);
+    //This function will send to clear student screen
+    //payload:ObJect:contains the roomeId
     socketRef.current.on("sendClear", (payload) => {
       if (payload.room == roomID) {
         p.background(240);
       } //end if payload.room
     });
+    //This function will  get the mouse position from teacher
+    //coord:Object:contians teacher send info
     socketRef.current.on("sendCoord", (coord) => {
       if (roomID == coord.room) {
         //calculations
@@ -73,7 +77,7 @@ const Whiteboard = (props) => {
     p5.background(240);
   }; //end setup
 
-  //This fucntion will clear the canvas
+  //This function  will clear the canvas
   const clear = () => {
     p.background(240);
     //emit
@@ -112,30 +116,32 @@ const Whiteboard = (props) => {
 
   return (
     <div>
-      {role == true ? (
-        <div>
-          {" "}
-          <div className="optionToDraw">
-            <label>Color:</label>
-            <button onClick={clear}>Clear Screen</button>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-            />
-            <input
-              type="number"
-              min={1}
-              max={100}
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-            />
+      {
+        role == true ? (
+          <div>
+            {" "}
+            <div className="optionToDraw">
+              <label>Color:</label>
+              <button onClick={clear}>Clear Screen</button>
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+              />
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+            </div>
+            <Sketch setup={setup} mouseDragged={mouseDragged} />
           </div>
-          <Sketch setup={setup} mouseDragged={mouseDragged} />
-        </div>
-      ) : (
-        <Sketch setup={setup} />
-      )}
+        ) : (
+          <Sketch setup={setup} />
+        ) //end if role
+      }
     </div>
   );
 }; //end Whiteboard

@@ -9,14 +9,14 @@ import { app } from "../utils/base";
 const { Header } = Layout;
 
 //This function will return a header component
-//return:JSX:returns headersections jsx expression
+//return:String:returns headersections jsx expression
 const HeaderSection = () => {
   return (
     <Header className="site-layout-background" style={{ padding: 0 }}>
       <Button
         size="large"
         style={{ float: "right", margin: "10px" }}
-        onClick={() => app.auth().signOut()}
+        onClick={() => app.auth().signOut()} // sign out button
         type="primary"
       >
         Sign out

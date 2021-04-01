@@ -11,7 +11,7 @@ import { Layout, Card, Spin, Button, Form, Input, Modal } from "antd";
 import SiderBar from "./SideBar";
 import FooterSection from "./FooterSection";
 import HeaderSection from "./HeaderSection";
-import { convertMS } from "../utils/algoritims";
+import { convertMS } from "../utils/algorithm";
 const { Content } = Layout;
 
 class Home extends Component {
@@ -30,18 +30,17 @@ class Home extends Component {
     if (code != undefined) {
       if (status["Classes"] == undefined) {
         status["Classes"] = [];
-      }
+      } //end if status["Classes"]
       status["Classes"].push(code);
     } //end code
-    console.log(status.Classes);
 
-    let latest = await getLatestAssessments(status.Classes);
+    let latest = await getLatestAssessments(status.Classes); // get latest assessments
     if (latest == undefined) latest = false; // end if latest
     this.setState({ latest });
   }; //end getLatestAssesment
 
   //This function will render the lastest assesments from the database
-  //return:JSX:returns the latest assements using jsx expressions
+  //return:String:returns the latest assements using jsx expressions
   renderLatest = () => {
     const { latest } = this.state;
     if (latest == false) return <h3>No Latest Assessment</h3>; //end if latest
@@ -59,7 +58,7 @@ class Home extends Component {
           {val.descp}
         </Card>
       );
-    });
+    }); //end mapping latest
   }; //end renderLatest
 
   //This function handles the show button in modal
@@ -84,7 +83,7 @@ class Home extends Component {
     if (values != null) {
       const result = await joinClass(values.code, currentUser.uid); //calling joinClass to add class to firestore
       if (result != undefined) {
-        alert("This Class Does Not Exist");
+        alert("This Class Does Not Exist"); //alert if class doesnt exist
       } //end if result
     } //end if values
     getRole(true);
@@ -93,7 +92,7 @@ class Home extends Component {
   }; //end addToClass
 
   //This function will check if the user is a student and return student info
-  //return:JSX:this returns a jsx expression if the user is a student
+  //return:String:this returns a jsx expression if the user is a student
   getRole = () => {
     const { status } = this.context;
     if (status.role == false) {
@@ -139,7 +138,7 @@ class Home extends Component {
   } //end componentDidMount
 
   //This function will render the home component
-  //return:JSX:contains jsx expression of home component
+  //return:String:contains jsx expression of home component
   render() {
     const { latest } = this.state;
     return (
@@ -149,13 +148,15 @@ class Home extends Component {
           <HeaderSection />
           <Content style={{ margin: "10px 16px" }}>
             <Card title="Latest Assessments" extra={this.getRole()}>
-              {latest == undefined ? (
-                <div className="loader">
-                  <Spin size="large" tip="Loading..." />
-                </div>
-              ) : (
-                this.renderLatest()
-              )}
+              {
+                latest == undefined ? (
+                  <div className="loader">
+                    <Spin size="large" tip="Loading..." />
+                  </div>
+                ) : (
+                  this.renderLatest()
+                ) //end if latest
+              }
             </Card>
           </Content>
           <FooterSection />

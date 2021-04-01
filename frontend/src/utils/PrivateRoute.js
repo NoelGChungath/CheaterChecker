@@ -9,7 +9,7 @@ import { AuthContext } from "./Auth";
 
 //This function will render the private route component
 //component:Object:contains component hsitory
-//return:JSX: jsx expression of private route
+//return:String: jsx expression of private route
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
   const { currentUser } = useContext(AuthContext);
 

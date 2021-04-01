@@ -16,14 +16,14 @@ const { Content } = Layout;
 class Login extends Component {
   static contextType = AuthContext;
 
-  //This function will handle gooLogin
+  //This function will handle google login
   googleLogin = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    app.auth().signInWithRedirect(provider);
+    app.auth().signInWithRedirect(provider); //google sign in
   }; //end googleLogin
 
   //This function will render the login page
-  //return:JSX:returns thr login page
+  //return:String:returns thr login page
   render() {
     return (
       <Layout style={{ minHeight: "100vh" }}>
