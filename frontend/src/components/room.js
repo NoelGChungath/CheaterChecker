@@ -157,8 +157,8 @@ const Room = (props) => {
           width: 1280,
           height: 720,
           frameRate: {
-            ideal: 2,
-            max: 3,
+            ideal: 25,
+            max: 30,
           },
         },
         cursor: true,
@@ -198,7 +198,7 @@ const Room = (props) => {
                 }); // send data to teacher
               } //end if checker
             } catch (e) {} //end try
-          }, 1000);
+          }, 10);
         } //end if role
 
         socketRef.current.emit("join room", roomID);
