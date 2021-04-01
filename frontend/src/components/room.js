@@ -149,7 +149,7 @@ const Room = (props) => {
 
   //This function will create connection to socket and intialize sceenshare
   useEffect(() => {
-    socketRef.current = io.connect(endPoint.prod); //connecting server
+    socketRef.current = io.connect(endPoint.local); //connecting server
     //start screenshare
     navigator.mediaDevices
       .getDisplayMedia({

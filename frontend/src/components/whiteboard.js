@@ -25,7 +25,7 @@ const Whiteboard = (props) => {
   //p5:Object:contains in p5 Object
   //parent:Object:contains p5 parent
   const setup = (p5, parent) => {
-    socketRef.current = io.connect(endPoint.prod);
+    socketRef.current = io.connect(endPoint.local);
     //This function will send to clear student screen
     //payload:ObJect:contains the roomeId
     socketRef.current.on("sendClear", (payload) => {
