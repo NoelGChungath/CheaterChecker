@@ -1,6 +1,6 @@
-#Noel Gregory
-#2021-03-20
-#server of the app
+//Noel Gregory
+//2021-03-20
+//server of the app
 
 //imports
 const express = require("express");
