@@ -1,9 +1,15 @@
+#Noel Gregory
+#2021-03-20
+#server of the app
+
+//imports
 const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
 
+//setting access
 const io = socket(server, {
   cors: {
     origin: "*",
@@ -17,10 +23,12 @@ const socketToRoom = {};
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 8000;
+//Starting to listen
 server.listen(PORT, () => console.log("server is running on port 8000"));
 app.get("/rooms", (req, resp) => {
   resp.send({ users });
 });
+//io connections
 io.on("connection", (socket) => {
   socket.on("join room", (roomID) => {
     if (users[roomID]) {
